@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
     Copyright 2020 Jarthianur
@@ -23,6 +23,7 @@ import json
 import jinja2
 import sys
 import docker
+import logging
 
 
 class PrepareError(Exception):
@@ -30,7 +31,7 @@ class PrepareError(Exception):
 
 
 def fail(msg):
-    click.echo(msg)
+    logging.error(msg)
     sys.exit(1)
 
 
@@ -47,7 +48,7 @@ def resolvePackageJson(fpath, deps, plugs):
             if pkg_plugs:
                 plugs.update(pkg_plugs)
     except Exception as e:
-        click.echo("[WARNING] Could not read %s. Cause: %s" % (fpath, e))
+        logging.warning("Could not read %s. Cause: %s" % (fpath, e))
 
 
 def preparePackageJson(ctx):
@@ -69,8 +70,7 @@ def preparePackageJson(ctx):
             res.write(pkg_tmpl.render(app=app_yml['app'], package={
                 'dependencies': deps.items(), 'theiaPlugins': plugs.items()}))
     except Exception as e:
-        raise PrepareError(
-            "[ERROR] Failed to write %s! Cause: %s" % (fpath, e))
+        raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
 
 
 def resolveDockerfile(fpath, scripts):
@@ -80,7 +80,7 @@ def resolveDockerfile(fpath, scripts):
         with fpath.open('r') as dockfile:
             scripts.append(dockfile.read().strip())
     except Exception as e:
-        click.echo("[WARNING] Could not read %s. Cause: %s" % (fpath, e))
+        logging.warning("Could not read %s. Cause: %s", fpath, e)
 
 
 def prepareDockerfile(ctx):
@@ -100,8 +100,7 @@ def prepareDockerfile(ctx):
         with fpath.open('w') as res:
             res.write(dock_tmpl.render(scripts=scripts))
     except Exception as e:
-        raise PrepareError(
-            "[ERROR] Failed to write %s! Cause: %s" % (fpath, e))
+        raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
 
 
 def prepareApp(ctx):
@@ -118,7 +117,7 @@ def initAppDir(ctx, app_dir):
         with fpath.open('r') as app_yaml:
             ctx.obj['APP_YAML'] = yaml.safe_load(app_yaml)
     except (yaml.YAMLError, FileNotFoundError) as e:
-        fail("[ERROR] Failed to parse %s! Cause: %s" % (fpath, e))
+        fail("Failed to parse %s! Cause: %s" % (fpath, e))
 
 
 @click.group()
@@ -128,6 +127,8 @@ def cli(ctx):
     An application is defined by an 'application.yaml' file inside the APP_DIR directory.
     """
     ctx.ensure_object(dict)
+    logging.basicConfig(
+        format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO)
 
 
 @cli.command()
@@ -153,12 +154,12 @@ def prepare(ctx, app_dir, mod_dir):
                  Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(strict=True)]
             ))
         prepareApp(ctx)
-        click.echo("Successfully prepared '%s' at [%s]. You may know build the container."
-                   % (ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR']))
+        logging.info("Successfully prepared '%s' at [%s]. You may know build the container.",
+                     ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
     except (jinja2.TemplateError, FileNotFoundError) as e:
-        fail("[ERROR] Failed read template files! Cause: %s" % e)
-    except KeyError as e:
-        fail("[ERROR] Failed to access required field! Cause: %s" % e)
+        fail("Failed read template files! Cause: %s" % e)
+    except (KeyError, TypeError) as e:
+        fail("Failed to access required field! Cause: %s" % e)
     except PrepareError as e:
         fail(e)
 
@@ -176,15 +177,36 @@ def build(ctx, app_dir, latest):
     initAppDir(ctx, app_dir)
     client = docker.from_env()
     app_yml = ctx.obj['APP_YAML']
-    tag = "%s/%s" % (app_yml['app']['org'],
-                     app_yml['app']['name'])
-    img = client.images.build(path=app_dir,
-                              tag=("%s:%s" % (tag, app_yml['app']['version'])))
-    registry = app_yml['build'].get('registry')
-    if registry:
-        img.tag(registry, "%s:%s" % (tag, app_yml['app']['version']))
-    if latest:
-        img.tag(registry, "%s:latest" % tag)
+    repo = "%s/%s" % (app_yml['app']['org'],
+                      app_yml['app']['name'])
+
+    logging.info("Building docker image for %s. This may take a while.", repo)
+    try:
+        img, log = client.images.build(path=app_dir,
+                                       tag=("%s:%s" % (repo, app_yml['app']['version'])))
+        for l in log:
+            if l.get('stream'):
+                click.echo(l['stream'].rstrip())
+        logging.info("Successfully built docker image.")
+    except (docker.errors.BuildError, docker.errors.APIError) as e:
+        fail("Failed to build the application! Cause: %s" % e)
+
+    registry = None
+    try:
+        registry = app_yml['build']['registry']
+    except (TypeError, KeyError):
+        logging.warning(
+            "Could not get field 'build.registry' in application.yaml. Assuming no registry.")
+    try:
+        if registry:
+            img.tag("%s/%s" % (registry, repo), "%s" %
+                    app_yml['app']['version'])
+        if latest:
+            img.tag(("%s/%s" % (registry, repo))
+                    if registry else repo, "latest")
+        logging.info("Successfully tagged image as %s", img.tags)
+    except docker.errors.APIError as e:
+        fail("Failed to tag docker image! Cause: %s" % e)
 
 
 if __name__ == '__main__':

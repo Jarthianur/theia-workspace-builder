@@ -24,7 +24,8 @@ setup(
         'Click',
         'pyyaml',
         'Jinja2',
-        'pathlib'
+        'pathlib',
+        'docker'
     ],
     entry_points='''
         [console_scripts]
