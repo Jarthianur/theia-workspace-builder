@@ -1,0 +1,12 @@
+{
+    "cpp.clangTidy": true,
+    "editor.renderWhitespace": "boundary",
+    "workbench.iconTheme": "theia-file-icons",
+    "editor.minimap.enabled": false,
+    "cpp.buildConfigurations": [{
+        "name": "Test",
+        "directory": "/home/project/build"
+    }],
+    "cpp.clangdArgs": "--background-index",
+    "cpp.clangTidyChecks": "*"
+}

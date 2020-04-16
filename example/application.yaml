@@ -1,0 +1,8 @@
+app:
+  name: theia-example-cpp
+  version: "0.0.1"
+  license: "Apache-2.0"
+  title: "Example Theia Application"
+modules:
+  - cpp
+  - sys-manager
