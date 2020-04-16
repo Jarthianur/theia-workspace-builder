@@ -22,6 +22,7 @@ from pathlib import Path
 import json
 import jinja2
 import sys
+import docker
 
 
 class PrepareError(Exception):
@@ -137,6 +138,7 @@ def cli(ctx):
 def prepare(ctx, app_dir, mod_dir):
     """Prepare the application build.
     Generates a Dockerfile and package.json inside APP_DIR.
+    As 'prepare' should not run as privileged user, it needs to be invoked separately before 'build'.
     """
     initAppDir(ctx, app_dir)
     if mod_dir:
@@ -159,6 +161,30 @@ def prepare(ctx, app_dir, mod_dir):
         fail("[ERROR] Failed to access required field! Cause: %s" % e)
     except PrepareError as e:
         fail(e)
+
+
+@cli.command()
+@click.argument('app_dir', type=click.Path(exists=True, file_okay=False))
+@click.option('--latest/--no-latest', 'latest', default=True,
+              help="Additionally to the version tag, add a 'latest' tag to the image.")
+@click.pass_context
+def build(ctx, app_dir, latest):
+    """Build the application.
+    Prudoces a docker image for the application specified in APP_DIR.
+    Assumes 'prepare' has been invoked successfully.
+    """
+    initAppDir(ctx, app_dir)
+    client = docker.from_env()
+    app_yml = ctx.obj['APP_YAML']
+    tag = "%s/%s" % (app_yml['app']['org'],
+                     app_yml['app']['name'])
+    img = client.images.build(path=app_dir,
+                              tag=("%s:%s" % (tag, app_yml['app']['version'])))
+    registry = app_yml['build'].get('registry')
+    if registry:
+        img.tag(registry, "%s:%s" % (tag, app_yml['app']['version']))
+    if latest:
+        img.tag(registry, "%s:latest" % tag)
 
 
 if __name__ == '__main__':
