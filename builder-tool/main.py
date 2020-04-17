@@ -175,18 +175,27 @@ def build(ctx, app_dir, latest):
     Assumes 'prepare' has been invoked successfully.
     """
     initAppDir(ctx, app_dir)
-    client = docker.from_env()
+    client = docker.APIClient(base_url='unix://var/run/docker.sock')
     app_yml = ctx.obj['APP_YAML']
     repo = "%s/%s" % (app_yml['app']['org'],
                       app_yml['app']['name'])
 
     logging.info("Building docker image for %s. This may take a while.", repo)
+
+    img = None
     try:
-        img, log = client.images.build(path=app_dir,
-                                       tag=("%s:%s" % (repo, app_yml['app']['version'])))
-        for l in log:
-            if l.get('stream'):
-                click.echo(l['stream'].rstrip())
+        stream = client.build(
+            decode=True,
+            path=app_dir,
+            tag=("%s:%s" % (repo, app_yml['app']['version'])),
+        )
+        for chunk in stream:
+            if 'stream' in chunk:
+                for line in chunk['stream'].splitlines():
+                    click.echo(line.rstrip())
+            elif 'aux' in chunk:
+                click.echo(chunk)
+                img = chunk['aux']['ID']
         logging.info("Successfully built docker image.")
     except (docker.errors.BuildError, docker.errors.APIError) as e:
         fail("Failed to build the application! Cause: %s" % e)
@@ -199,12 +208,11 @@ def build(ctx, app_dir, latest):
             "Could not get field 'build.registry' in application.yaml. Assuming no registry.")
     try:
         if registry:
-            img.tag("%s/%s" % (registry, repo), "%s" %
-                    app_yml['app']['version'])
+            client.tag(img, "%s/%s" % (registry, repo), "%s" %
+                       app_yml['app']['version'], force=True)
         if latest:
-            img.tag(("%s/%s" % (registry, repo))
-                    if registry else repo, "latest")
-        logging.info("Successfully tagged image as %s", img.tags)
+            client.tag(img, ("%s/%s" % (registry, repo))
+                       if registry else repo, "latest", force=True)
     except docker.errors.APIError as e:
         fail("Failed to tag docker image! Cause: %s" % e)
 
