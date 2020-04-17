@@ -1,19 +1,19 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
-Copyright 2020 Jarthianur
+    Copyright 2020 Jarthianur
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-   http://www.apache.org/licenses/LICENSE-2.0
+       http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 """
 
 import click
@@ -22,6 +22,8 @@ from pathlib import Path
 import json
 import jinja2
 import sys
+import docker
+import logging
 
 
 class PrepareError(Exception):
@@ -29,7 +31,7 @@ class PrepareError(Exception):
 
 
 def fail(msg):
-    click.echo(msg)
+    logging.error(msg)
     sys.exit(1)
 
 
@@ -46,7 +48,7 @@ def resolvePackageJson(fpath, deps, plugs):
             if pkg_plugs:
                 plugs.update(pkg_plugs)
     except Exception as e:
-        click.echo("[WARNING] Could not read %s. Cause: %s" % (fpath, e))
+        logging.warning("Could not read %s. Cause: %s" % (fpath, e))
 
 
 def preparePackageJson(ctx):
@@ -68,8 +70,7 @@ def preparePackageJson(ctx):
             res.write(pkg_tmpl.render(app=app_yml['app'], package={
                 'dependencies': deps.items(), 'theiaPlugins': plugs.items()}))
     except Exception as e:
-        raise PrepareError(
-            "[ERROR] Failed to write %s! Cause: %s" % (fpath, e))
+        raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
 
 
 def resolveDockerfile(fpath, scripts):
@@ -79,7 +80,7 @@ def resolveDockerfile(fpath, scripts):
         with fpath.open('r') as dockfile:
             scripts.append(dockfile.read().strip())
     except Exception as e:
-        click.echo("[WARNING] Could not read %s. Cause: %s" % (fpath, e))
+        logging.warning("Could not read %s. Cause: %s", fpath, e)
 
 
 def prepareDockerfile(ctx):
@@ -99,8 +100,7 @@ def prepareDockerfile(ctx):
         with fpath.open('w') as res:
             res.write(dock_tmpl.render(scripts=scripts))
     except Exception as e:
-        raise PrepareError(
-            "[ERROR] Failed to write %s! Cause: %s" % (fpath, e))
+        raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
 
 
 def prepareApp(ctx):
@@ -117,7 +117,7 @@ def initAppDir(ctx, app_dir):
         with fpath.open('r') as app_yaml:
             ctx.obj['APP_YAML'] = yaml.safe_load(app_yaml)
     except (yaml.YAMLError, FileNotFoundError) as e:
-        fail("[ERROR] Failed to parse %s! Cause: %s" % (fpath, e))
+        fail("Failed to parse %s! Cause: %s" % (fpath, e))
 
 
 @click.group()
@@ -127,6 +127,8 @@ def cli(ctx):
     An application is defined by an 'application.yaml' file inside the APP_DIR directory.
     """
     ctx.ensure_object(dict)
+    logging.basicConfig(
+        format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO)
 
 
 @cli.command()
@@ -137,6 +139,7 @@ def cli(ctx):
 def prepare(ctx, app_dir, mod_dir):
     """Prepare the application build.
     Generates a Dockerfile and package.json inside APP_DIR.
+    As 'prepare' should not run as privileged user, it needs to be invoked separately before 'build'.
     """
     initAppDir(ctx, app_dir)
     if mod_dir:
@@ -151,14 +154,67 @@ def prepare(ctx, app_dir, mod_dir):
                  Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(strict=True)]
             ))
         prepareApp(ctx)
-        click.echo("Successfully prepared '%s' at [%s]. You may know build the container."
-                   % (ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR']))
+        logging.info("Successfully prepared '%s' at [%s]. You may know build the container.",
+                     ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
     except (jinja2.TemplateError, FileNotFoundError) as e:
-        fail("[ERROR] Failed read template files! Cause: %s" % e)
-    except KeyError as e:
-        fail("[ERROR] Failed to access required field! Cause: %s" % e)
+        fail("Failed read template files! Cause: %s" % e)
+    except (KeyError, TypeError) as e:
+        fail("Failed to access required field! Cause: %s" % e)
     except PrepareError as e:
         fail(e)
+
+
+@cli.command()
+@click.argument('app_dir', type=click.Path(exists=True, file_okay=False))
+@click.option('--latest/--no-latest', 'latest', default=True,
+              help="Additionally to the version tag, add a 'latest' tag to the image.")
+@click.pass_context
+def build(ctx, app_dir, latest):
+    """Build the application.
+    Prudoces a docker image for the application specified in APP_DIR.
+    Assumes 'prepare' has been invoked successfully.
+    """
+    initAppDir(ctx, app_dir)
+    client = docker.APIClient(base_url='unix://var/run/docker.sock')
+    app_yml = ctx.obj['APP_YAML']
+    repo = "%s/%s" % (app_yml['app']['org'],
+                      app_yml['app']['name'])
+
+    logging.info("Building docker image for %s. This may take a while.", repo)
+
+    img = None
+    try:
+        stream = client.build(
+            decode=True,
+            path=app_dir,
+            tag=("%s:%s" % (repo, app_yml['app']['version'])),
+        )
+        for chunk in stream:
+            if 'stream' in chunk:
+                for line in chunk['stream'].splitlines():
+                    click.echo(line.rstrip())
+            elif 'aux' in chunk:
+                click.echo(chunk)
+                img = chunk['aux']['ID']
+        logging.info("Successfully built docker image.")
+    except (docker.errors.BuildError, docker.errors.APIError) as e:
+        fail("Failed to build the application! Cause: %s" % e)
+
+    registry = None
+    try:
+        registry = app_yml['build']['registry']
+    except (TypeError, KeyError):
+        logging.warning(
+            "Could not get field 'build.registry' in application.yaml. Assuming no registry.")
+    try:
+        if registry:
+            client.tag(img, "%s/%s" % (registry, repo), "%s" %
+                       app_yml['app']['version'], force=True)
+        if latest:
+            client.tag(img, ("%s/%s" % (registry, repo))
+                       if registry else repo, "latest", force=True)
+    except docker.errors.APIError as e:
+        fail("Failed to tag docker image! Cause: %s" % e)
 
 
 if __name__ == '__main__':
