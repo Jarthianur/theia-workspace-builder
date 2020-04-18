@@ -1,5 +1,3 @@
-ARG BOOST=no
-
 RUN pacman -S --noconfirm \
       clang \
       openmp \
@@ -9,6 +7,5 @@ RUN pacman -S --noconfirm \
       make \
       gdb \
       binutils \
-      boost \
-      boost-libs && \
+      {% if parameters.boost is true %} boost boost-libs {% endif %} && \
     pacman -Scc --noconfirm

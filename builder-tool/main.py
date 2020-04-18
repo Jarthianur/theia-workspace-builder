@@ -73,12 +73,14 @@ def preparePackageJson(ctx):
         raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
 
 
-def resolveDockerfile(fpath, scripts):
-    if not Path(fpath).is_file():
+def resolveDockerfile(fpath, scripts, params):
+    if not Path(fpath).is_dir():
         return
     try:
-        with fpath.open('r') as dockfile:
-            scripts.append(dockfile.read().strip())
+        env = jinja2.Environment(loader=jinja2.FileSystemLoader(
+            fpath))
+        dock = env.get_template('Dockerfile.j2')
+        scripts.append(dock.render(parameters=params))
     except Exception as e:
         logging.warning("Could not read %s. Cause: %s", fpath, e)
 
@@ -90,10 +92,10 @@ def prepareDockerfile(ctx):
     app_dir = ctx.obj['APP_DIR']
 
     for mod in app_yml['modules']:
-        resolveDockerfile(Path(ctx.obj['MOD_DIR'], 'modules', mod, app_yml['app']['base'], 'Dockerfile').resolve(),
-                          scripts)
-    resolveDockerfile(Path(app_dir, 'module', 'Dockerfile').resolve(),
-                      scripts)
+        resolveDockerfile(Path(ctx.obj['MOD_DIR'], 'modules', mod, app_yml['app']['base']).resolve(),
+                          scripts, app_yml['parameters'][mod])
+    resolveDockerfile(Path(app_dir, 'module').resolve(),
+                      scripts, app_yml['parameters'][mod])
 
     fpath = Path(app_dir, 'Dockerfile').resolve()
     try:
