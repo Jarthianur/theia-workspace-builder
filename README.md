@@ -28,23 +28,24 @@ Resources like settings.json can be placed there in the app directory.
 The provisioning tool takes the base module and interpolates every module specified in the application.yaml into a resulting Dockerfile and package.json.
 From there the application can be built using docker cli.
 
-## Ideas for features
+## Current application.yaml layout
 
-### Build command
-
-For now the builder tool only prepares the Dockerfile and package.json inside the app directory.
-It would be great to also have a command that builds the container with arguments and tags specified in the application.yaml.
-
-### Different base images
-
-For now all workspaces are based on manjaro linux.
-While manjaro offers an excellent development environment, a certain base system is often required for a project, or environment.
-Hence it would be great to support different common base images, and make them selectable from the application.yaml.
-To make this possible, it would be required to provide different setups (Dockerfiles) for each base image and modules.
-
-### Parameterized builds
-
-Sometimes a module could offer optional features, or requires a certain version of something.
-For example in the *cpp* module boost is not always needed, and would blow the image size a lot.
-Maybe there is a certain language version used for development, which could be passed as argument to the build.
-Hence it would be great to allow arguments, or variables in the application.yaml
+```yaml
+app:
+  name: theia-example
+  version: "0.0.4"
+  org: my-org
+  license: "Apache-2.0"
+  title: "Example Theia Application"
+  base: manjaro
+parameters:
+  cpp:
+    with_boost: yes
+    with_omp: yes
+build:
+  registry: my-reg
+modules:
+  - cpp
+  - sys-manager
+  - python
+```

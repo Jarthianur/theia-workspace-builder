@@ -105,11 +105,6 @@ def prepareDockerfile(ctx):
         raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
 
 
-def prepareApp(ctx):
-    preparePackageJson(ctx)
-    prepareDockerfile(ctx)
-
-
 def initAppDir(ctx, app_dir):
     if ctx.obj.get('APP_DIR'):
         return
@@ -155,7 +150,8 @@ def prepare(ctx, app_dir, mod_dir):
                 [Path(ctx.obj['MOD_DIR'], 'base').resolve(strict=True),
                  Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(strict=True)]
             ))
-        prepareApp(ctx)
+        preparePackageJson(ctx)
+        prepareDockerfile(ctx)
         logging.info("Successfully prepared '%s' at [%s]. You may know build the container.",
                      ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
     except (jinja2.TemplateError, FileNotFoundError) as e:
