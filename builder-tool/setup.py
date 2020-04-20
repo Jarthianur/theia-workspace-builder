@@ -25,7 +25,8 @@ setup(
         'pyyaml',
         'Jinja2',
         'pathlib',
-        'docker'
+        'docker',
+        'schema'
     ],
     entry_points='''
         [console_scripts]

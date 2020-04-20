@@ -24,6 +24,7 @@ import jinja2
 import sys
 import docker
 import logging
+import validation
 
 
 class PrepareError(Exception):
@@ -41,12 +42,10 @@ def resolvePackageJson(fpath, deps, plugs):
     try:
         with fpath.open('r') as pkg_json:
             pkg = json.load(pkg_json)
-            pkg_deps = pkg.get('dependencies')
-            if pkg_deps:
-                deps.update(pkg_deps)
-            pkg_plugs = pkg.get('theiaPlugins')
-            if pkg_plugs:
-                plugs.update(pkg_plugs)
+            if 'dependencies' in pkg:
+                deps.update(pkg['dependencies'])
+            if 'theiaPlugins' in pkg:
+                plugs.update(pkg['theiaPlugins'])
     except Exception as e:
         logging.warning("Could not read %s. Cause: %s" % (fpath, e))
 
@@ -106,7 +105,7 @@ def prepareDockerfile(ctx):
 
 
 def initAppDir(ctx, app_dir):
-    if ctx.obj.get('APP_DIR'):
+    if 'APP_DIR' in ctx.obj:
         return
     ctx.obj['APP_DIR'] = app_dir
     fpath = Path(app_dir, 'application.yaml').resolve()
@@ -115,6 +114,10 @@ def initAppDir(ctx, app_dir):
             ctx.obj['APP_YAML'] = yaml.safe_load(app_yaml)
     except (yaml.YAMLError, FileNotFoundError) as e:
         fail("Failed to parse %s! Cause: %s" % (fpath, e))
+    try:
+        validation.validate(ctx.obj['APP_YAML'])
+    except validation.ValidationError as e:
+        fail(e)
 
 
 @click.group()
@@ -186,6 +189,7 @@ def build(ctx, app_dir, latest):
             decode=True,
             path=app_dir,
             tag=("%s:%s" % (repo, app_yml['app']['version'])),
+            buildargs=app_yml['build']['arguments']
         )
         for chunk in stream:
             if 'stream' in chunk:
