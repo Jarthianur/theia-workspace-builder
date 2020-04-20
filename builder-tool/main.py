@@ -73,12 +73,14 @@ def preparePackageJson(ctx):
         raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
 
 
-def resolveDockerfile(fpath, scripts):
-    if not Path(fpath).is_file():
+def resolveDockerfile(fpath, scripts, params):
+    if not Path(fpath).is_dir():
         return
     try:
-        with fpath.open('r') as dockfile:
-            scripts.append(dockfile.read().strip())
+        env = jinja2.Environment(loader=jinja2.FileSystemLoader(
+            fpath))
+        dock = env.get_template('Dockerfile.j2')
+        scripts.append(dock.render(parameters=params))
     except Exception as e:
         logging.warning("Could not read %s. Cause: %s", fpath, e)
 
@@ -90,10 +92,10 @@ def prepareDockerfile(ctx):
     app_dir = ctx.obj['APP_DIR']
 
     for mod in app_yml['modules']:
-        resolveDockerfile(Path(ctx.obj['MOD_DIR'], 'modules', mod, app_yml['app']['base'], 'Dockerfile').resolve(),
-                          scripts)
-    resolveDockerfile(Path(app_dir, 'module', 'Dockerfile').resolve(),
-                      scripts)
+        resolveDockerfile(Path(ctx.obj['MOD_DIR'], 'modules', mod, app_yml['app']['base']).resolve(),
+                          scripts, app_yml['parameters'][mod])
+    resolveDockerfile(Path(app_dir, 'module').resolve(),
+                      scripts, app_yml['parameters'][mod])
 
     fpath = Path(app_dir, 'Dockerfile').resolve()
     try:
@@ -101,11 +103,6 @@ def prepareDockerfile(ctx):
             res.write(dock_tmpl.render(scripts=scripts))
     except Exception as e:
         raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
-
-
-def prepareApp(ctx):
-    preparePackageJson(ctx)
-    prepareDockerfile(ctx)
 
 
 def initAppDir(ctx, app_dir):
@@ -153,7 +150,8 @@ def prepare(ctx, app_dir, mod_dir):
                 [Path(ctx.obj['MOD_DIR'], 'base').resolve(strict=True),
                  Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(strict=True)]
             ))
-        prepareApp(ctx)
+        preparePackageJson(ctx)
+        prepareDockerfile(ctx)
         logging.info("Successfully prepared '%s' at [%s]. You may know build the container.",
                      ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
     except (jinja2.TemplateError, FileNotFoundError) as e:
@@ -196,6 +194,8 @@ def build(ctx, app_dir, latest):
             elif 'aux' in chunk:
                 click.echo(chunk)
                 img = chunk['aux']['ID']
+        if not img:
+            fail("Failed to retrieve image ID from build! Something must have gone wrong.")
         logging.info("Successfully built docker image.")
     except (docker.errors.BuildError, docker.errors.APIError) as e:
         fail("Failed to build the application! Cause: %s" % e)
