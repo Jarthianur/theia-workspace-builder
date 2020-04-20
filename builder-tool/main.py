@@ -194,6 +194,8 @@ def build(ctx, app_dir, latest):
             elif 'aux' in chunk:
                 click.echo(chunk)
                 img = chunk['aux']['ID']
+        if not img:
+            fail("Failed to retrieve image ID from build! Something must have gone wrong.")
         logging.info("Successfully built docker image.")
     except (docker.errors.BuildError, docker.errors.APIError) as e:
         fail("Failed to build the application! Cause: %s" % e)
