@@ -34,16 +34,12 @@ APPLICATION_YAML = {
         Optional(str): Or(dict, None)
     },
     Optional('build'): {
-        'registry': And(str, len),
-        'arguments': Optional(dict)
+        Optional('registry'): Or(And(str, len), None),
+        Optional('arguments'): Or(dict, None)
     },
-    Optional('build'): {
-        'registry': And(str, len),
-        'arguments': Optional(dict)
-    },
-    'modules': [
+    Optional('modules'): Or([
         And(str, len),
-    ]
+    ], None)
 }
 
 
