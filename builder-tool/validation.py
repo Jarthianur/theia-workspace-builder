@@ -31,7 +31,7 @@ APPLICATION_YAML = {
         'base': And(str, len)
     },
     Optional('parameters'): {
-        Optional(str): Or(dict, None)
+        Optional(And(str, len)): Or(dict, None)
     },
     Optional('build'): {
         Optional('registry'): Or(And(str, len), None),
