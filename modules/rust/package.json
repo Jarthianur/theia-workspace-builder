@@ -1,0 +1,9 @@
+{
+    "dependencies": {
+        "@theia/rust": "next",
+        "@theia/cpp-debug": "next"
+    },
+    "theiaPlugins": {
+        "vscode-builtin-rust": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/rust-1.39.1-prel.vsix"
+    }
+}

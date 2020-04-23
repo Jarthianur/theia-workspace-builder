@@ -1,0 +1,9 @@
+RUN pacman -S --noconfirm \
+      rustup \
+      make \
+      gdb \
+      binutils && \
+    pacman -Scc --noconfirm
+
+RUN rustup default stable && \
+    rustup component add rls rust-src rust-analysis
