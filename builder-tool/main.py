@@ -24,6 +24,7 @@ import jinja2
 import sys
 import docker
 import logging
+import validation
 
 
 class PrepareError(Exception):
@@ -41,12 +42,10 @@ def resolvePackageJson(fpath, deps, plugs):
     try:
         with fpath.open('r') as pkg_json:
             pkg = json.load(pkg_json)
-            pkg_deps = pkg.get('dependencies')
-            if pkg_deps:
-                deps.update(pkg_deps)
-            pkg_plugs = pkg.get('theiaPlugins')
-            if pkg_plugs:
-                plugs.update(pkg_plugs)
+            if 'dependencies' in pkg:
+                deps.update(pkg['dependencies'])
+            if 'theiaPlugins' in pkg:
+                plugs.update(pkg['theiaPlugins'])
     except Exception as e:
         logging.warning("Could not read %s. Cause: %s" % (fpath, e))
 
@@ -58,7 +57,7 @@ def preparePackageJson(ctx):
     app_yml = ctx.obj['APP_YAML']
     app_dir = ctx.obj['APP_DIR']
 
-    for mod in app_yml['modules']:
+    for mod in app_yml.get('modules') or ():
         resolvePackageJson(Path(ctx.obj['MOD_DIR'], 'modules', mod, 'package.json').resolve(),
                            deps, plugs)
     resolvePackageJson(Path(app_dir, 'module', 'package.json').resolve(),
@@ -91,11 +90,11 @@ def prepareDockerfile(ctx):
     app_yml = ctx.obj['APP_YAML']
     app_dir = ctx.obj['APP_DIR']
 
-    for mod in app_yml['modules']:
+    for mod in app_yml.get('modules') or ():
         resolveDockerfile(Path(ctx.obj['MOD_DIR'], 'modules', mod, app_yml['app']['base']).resolve(),
-                          scripts, app_yml['parameters'][mod])
+                          scripts, app_yml.get('parameters', {}).get(mod))
     resolveDockerfile(Path(app_dir, 'module').resolve(),
-                      scripts, app_yml['parameters'][mod])
+                      scripts, app_yml.get('parameters', {}).get(mod))
 
     fpath = Path(app_dir, 'Dockerfile').resolve()
     try:
@@ -106,7 +105,7 @@ def prepareDockerfile(ctx):
 
 
 def initAppDir(ctx, app_dir):
-    if ctx.obj.get('APP_DIR'):
+    if 'APP_DIR' in ctx.obj:
         return
     ctx.obj['APP_DIR'] = app_dir
     fpath = Path(app_dir, 'application.yaml').resolve()
@@ -115,6 +114,10 @@ def initAppDir(ctx, app_dir):
             ctx.obj['APP_YAML'] = yaml.safe_load(app_yaml)
     except (yaml.YAMLError, FileNotFoundError) as e:
         fail("Failed to parse %s! Cause: %s" % (fpath, e))
+    try:
+        validation.validate(ctx.obj['APP_YAML'])
+    except validation.ValidationError as e:
+        fail(e)
 
 
 @click.group()
@@ -186,26 +189,21 @@ def build(ctx, app_dir, latest):
             decode=True,
             path=app_dir,
             tag=("%s:%s" % (repo, app_yml['app']['version'])),
+            buildargs=app_yml.get('build', {}).get('arguments')
         )
         for chunk in stream:
             if 'stream' in chunk:
                 for line in chunk['stream'].splitlines():
                     click.echo(line.rstrip())
             elif 'aux' in chunk:
-                click.echo(chunk)
                 img = chunk['aux']['ID']
         if not img:
             fail("Failed to retrieve image ID from build! Something must have gone wrong.")
         logging.info("Successfully built docker image.")
-    except (docker.errors.BuildError, docker.errors.APIError) as e:
+    except docker.errors.APIError as e:
         fail("Failed to build the application! Cause: %s" % e)
 
-    registry = None
-    try:
-        registry = app_yml['build']['registry']
-    except (TypeError, KeyError):
-        logging.warning(
-            "Could not get field 'build.registry' in application.yaml. Assuming no registry.")
+    registry = app_yml.get('build', {}).get('registry')
     try:
         if registry:
             client.tag(img, "%s/%s" % (registry, repo), "%s" %
