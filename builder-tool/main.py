@@ -184,6 +184,7 @@ def prepare(ctx, app_dir, mod_dir):
         logging.info("Successfully prepared '%s' at [%s]. You may now build the container.",
                      ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
     except (jinja2.TemplateError, OSError) as e:
+        cleanAppDir(app_dir)
         fail("Failed to read base template files! Cause: %s" % e)
     except PrepareError as e:
         cleanAppDir(app_dir)
