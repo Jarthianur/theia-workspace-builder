@@ -25,7 +25,8 @@ RUN source /usr/share/nvm/init-nvm.sh && \
     nvm use 10 && \
     mkdir bin && \
     ln -s "$(echo -n $PATH | tr ':' '\n' | grep nvm)/node" /home/theia/bin/node && \
-    ln -s /usr/bin/python2 /home/theia/bin/python
+    npm config set python /usr/bin/python2 --global && \
+    npm config set python /usr/bin/python2
 
 ENV PATH=/home/theia/bin:$PATH
 
