@@ -17,9 +17,9 @@ from setuptools import setup
 """
 
 setup(
-    name='theia_builder',
+    name='tws_builder',
     version='0.1',
-    py_modules=['theia_builder'],
+    py_modules=['tws_builder'],
     install_requires=[
         'Click',
         'pyyaml',
@@ -30,6 +30,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        theia_builder=main:cli
+        tws_builder=main:cli
     ''',
 )

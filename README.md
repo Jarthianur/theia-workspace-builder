@@ -49,3 +49,9 @@ modules:
   - sys-manager
   - python
 ```
+
+## Currently supported base systems
+
+|Base|Use Case|
+|--|--|
+|manjaro|Cutting edge development platform.|
