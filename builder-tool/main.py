@@ -31,6 +31,10 @@ class PrepareError(Exception):
     pass
 
 
+class BuildError(Exception):
+    pass
+
+
 def fail(msg):
     logging.error(msg)
     sys.exit(1)
@@ -38,6 +42,7 @@ def fail(msg):
 
 def resolvePackageJson(fpath, deps, plugs):
     if not Path(fpath).is_file():
+        logging.warning("Could not find [%s]." % fpath)
         return
     try:
         with fpath.open('r') as pkg_json:
@@ -46,8 +51,10 @@ def resolvePackageJson(fpath, deps, plugs):
                 deps.update(pkg['dependencies'])
             if 'theiaPlugins' in pkg:
                 plugs.update(pkg['theiaPlugins'])
-    except Exception as e:
-        logging.warning("Could not read %s. Cause: %s" % (fpath, e))
+    except json.JSONDecodeError as e:
+        raise PrepareError("Invalid JSON in [%s]! Cause: %s" % (fpath, e))
+    except OSError as e:
+        raise PrepareError("File at [%s] not readable! Cause: %s" % (fpath, e))
 
 
 def preparePackageJson(ctx):
@@ -68,20 +75,25 @@ def preparePackageJson(ctx):
         with fpath.open('w') as res:
             res.write(pkg_tmpl.render(app=app_yml['app'], package={
                 'dependencies': deps.items(), 'theiaPlugins': plugs.items()}))
-    except Exception as e:
-        raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
+    except jinja2.TemplateError as e:
+        raise PrepareError(
+            "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
+    except OSError as e:
+        raise PrepareError("File at [%s] not writable! Cause: %s" % (fpath, e))
 
 
 def resolveDockerfile(fpath, scripts, params):
     if not Path(fpath).is_dir():
+        logging.warning("Could not find [%s]." % fpath)
         return
     try:
         env = jinja2.Environment(loader=jinja2.FileSystemLoader(
             fpath))
         dock = env.get_template('Dockerfile.j2')
         scripts.append(dock.render(parameters=params))
-    except Exception as e:
-        logging.warning("Could not read %s. Cause: %s", fpath, e)
+    except jinja2.TemplateError as e:
+        raise PrepareError(
+            "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
 
 
 def prepareDockerfile(ctx):
@@ -100,8 +112,11 @@ def prepareDockerfile(ctx):
     try:
         with fpath.open('w') as res:
             res.write(dock_tmpl.render(scripts=scripts))
-    except Exception as e:
-        raise PrepareError("Failed to write %s! Cause: %s" % (fpath, e))
+    except jinja2.TemplateError as e:
+        raise PrepareError(
+            "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
+    except OSError as e:
+        raise PrepareError("File at [%s] not writable! Cause: %s" % (fpath, e))
 
 
 def initAppDir(ctx, app_dir):
@@ -112,12 +127,23 @@ def initAppDir(ctx, app_dir):
     try:
         with fpath.open('r') as app_yaml:
             ctx.obj['APP_YAML'] = yaml.safe_load(app_yaml)
-    except (yaml.YAMLError, FileNotFoundError) as e:
-        fail("Failed to parse %s! Cause: %s" % (fpath, e))
+    except (yaml.YAMLError, OSError) as e:
+        fail("Failed to parse [%s]! Cause: %s" % (fpath, e))
     try:
         validation.validate(ctx.obj['APP_YAML'])
     except validation.ValidationError as e:
         fail(e)
+
+
+def cleanAppDir(app_dir):
+    try:
+        Path(app_dir, 'package.json').resolve(strict=True).unlink()
+    except Exception:
+        pass
+    try:
+        Path(app_dir, 'Dockerfile').resolve(strict=True).unlink()
+    except Exception:
+        pass
 
 
 @click.group()
@@ -155,14 +181,48 @@ def prepare(ctx, app_dir, mod_dir):
             ))
         preparePackageJson(ctx)
         prepareDockerfile(ctx)
-        logging.info("Successfully prepared '%s' at [%s]. You may know build the container.",
+        logging.info("Successfully prepared '%s' at [%s]. You may now build the container.",
                      ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
-    except (jinja2.TemplateError, FileNotFoundError) as e:
-        fail("Failed read template files! Cause: %s" % e)
-    except (KeyError, TypeError) as e:
-        fail("Failed to access required field! Cause: %s" % e)
+    except (jinja2.TemplateError, OSError) as e:
+        fail("Failed to read base template files! Cause: %s" % e)
     except PrepareError as e:
-        fail(e)
+        cleanAppDir(app_dir)
+        fail("Failed to prepare the application! Cause: %s" % e)
+
+
+def buildDockerImage(client, repo, app_dir, app_yml):
+    img = None
+    try:
+        stream = client.build(
+            decode=True,
+            path=app_dir,
+            tag=("%s:%s" % (repo, app_yml['app']['version'])),
+            buildargs=app_yml.get('build', {}).get('arguments')
+        )
+        for chunk in stream:
+            if 'stream' in chunk:
+                for line in chunk['stream'].splitlines():
+                    click.echo(line.rstrip())
+            elif 'aux' in chunk:
+                img = chunk['aux']['ID']
+        if not img:
+            raise BuildError("Build returned no image ID!")
+    except docker.errors.APIError as e:
+        raise BuildError(e)
+    return img
+
+
+def tagDockerImage(client, img, repo, latest, app_yml):
+    registry = app_yml.get('build', {}).get('registry')
+    try:
+        if registry:
+            client.tag(img, "%s/%s" % (registry, repo), "%s" %
+                       app_yml['app']['version'], force=True)
+        if latest:
+            client.tag(img, ("%s/%s" % (registry, repo))
+                       if registry else repo, "latest", force=True)
+    except docker.errors.APIError as e:
+        raise BuildError(e)
 
 
 @cli.command()
@@ -182,37 +242,21 @@ def build(ctx, app_dir, latest):
                       app_yml['app']['name'])
 
     logging.info("Building docker image for %s. This may take a while.", repo)
-
     img = None
     try:
-        stream = client.build(
-            decode=True,
-            path=app_dir,
-            tag=("%s:%s" % (repo, app_yml['app']['version'])),
-            buildargs=app_yml.get('build', {}).get('arguments')
-        )
-        for chunk in stream:
-            if 'stream' in chunk:
-                for line in chunk['stream'].splitlines():
-                    click.echo(line.rstrip())
-            elif 'aux' in chunk:
-                img = chunk['aux']['ID']
-        if not img:
-            fail("Failed to retrieve image ID from build! Something must have gone wrong.")
-        logging.info("Successfully built docker image.")
-    except docker.errors.APIError as e:
-        fail("Failed to build the application! Cause: %s" % e)
-
-    registry = app_yml.get('build', {}).get('registry')
+        img = buildDockerImage(client, repo, app_dir, app_yml)
+    except OSError:
+        fail("Failed to connect to docker daemon!")
+    except BuildError as e:
+        fail("Failed to build the docker image! Cause: %s" % e)
+    logging.info("Successfully built the docker image.")
     try:
-        if registry:
-            client.tag(img, "%s/%s" % (registry, repo), "%s" %
-                       app_yml['app']['version'], force=True)
-        if latest:
-            client.tag(img, ("%s/%s" % (registry, repo))
-                       if registry else repo, "latest", force=True)
-    except docker.errors.APIError as e:
-        fail("Failed to tag docker image! Cause: %s" % e)
+        tagDockerImage(client, img, repo, latest, app_yml)
+    except OSError:
+        fail("Failed to connect to docker daemon!")
+    except BuildError as e:
+        fail("Failed to tag the docker image! Cause: %s" % e)
+    logging.info("Successfully tagged the docker image.")
 
 
 if __name__ == '__main__':
