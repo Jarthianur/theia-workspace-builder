@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-
-"""
-    Copyright 2020 Jarthianur
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-"""
+"""Main script of the builder tool."""
+#
+#    Copyright 2020 Jarthianur
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
 
 import click
 import yaml
@@ -28,19 +28,41 @@ import validation
 
 
 class PrepareError(Exception):
+    """Exception that is thrown if preparation fails."""
     pass
 
 
 class BuildError(Exception):
+    """Exception that is thrown if build fails."""
     pass
 
 
 def fail(msg):
+    """Quit programm with error.
+
+    Print an error message, and exit the whole programm with an error code unequals 0.
+
+    Args:
+        msg (str): An error message to print before exit.
+    """
     logging.error(msg)
     sys.exit(1)
 
 
 def resolvePackageJson(fpath, deps, plugs):
+    """Resolve dependencies and plugins from a 'package.json' file.
+
+    Read a 'package.json' file, and extract dependencies and plugins from it.
+    Dependencies will be stored in deps, plugins in plugs.
+
+    Args:
+        fpath (Path): The unclusive path to the file.
+        deps (dict): The object where to store dependencies in.
+        plugs (dict): The object where to store plugins in.
+
+    Raises:
+        PrepareError: If the file contains invalid json, or is not readable.
+    """
     if not Path(fpath).is_file():
         logging.warning("Could not find [%s]." % fpath)
         return
@@ -58,6 +80,19 @@ def resolvePackageJson(fpath, deps, plugs):
 
 
 def preparePackageJson(ctx):
+    """Prepare the applications 'package.json' file.
+
+    Resolve 'package.json' files from all listed modules,
+    and write the merged 'package.json' file into the application directory.
+
+    Args:
+        ctx (dict): The click context.
+
+    Raises:
+        PrepareError: If the base template is invalid,
+                      something goes wrong while resolving files,
+                      or the resulting 'package.json' file can not be written.
+    """
     pkg_tmpl = ctx.obj['TMPL_ENV'].get_template('package.json.j2')
     deps = dict()
     plugs = dict()
@@ -83,6 +118,19 @@ def preparePackageJson(ctx):
 
 
 def resolveDockerfile(fpath, scripts, params):
+    """Resolve installation setps from a Dockerfile template.
+
+    Read a 'Dockerfile.j2' template file, and process it as template.
+    The resulting Dockerfile part is stored into scripts.
+
+    Args:
+        fpath (Path): The module path, where to look for 'Dockerfile.j2'.
+        scripts (dict): The object, where to store the partial scripts in.
+        params (dict): The template parameters, that are passed into the template while processing.
+
+    Raises:
+        PrepareError: If the template is invalid, or not readable.
+    """
     if not Path(fpath).is_dir():
         logging.warning("Could not find [%s]." % fpath)
         return
@@ -97,6 +145,19 @@ def resolveDockerfile(fpath, scripts, params):
 
 
 def prepareDockerfile(ctx):
+    """Prepare the applications 'Dockerfile' file.
+
+    Resolve 'Dockerfile.j2' files from all listed modules,
+    and write the merged 'Dockerfile' file into the application directory.
+
+    Args:
+        ctx (dict): The click context.
+
+    Raises:
+        PrepareError: If the base template is invalid,
+                      something goes wrong while resolving files,
+                      or the resulting 'Dockerfile' file can not be written.
+    """
     dock_tmpl = ctx.obj['TMPL_ENV'].get_template('Dockerfile.j2')
     scripts = list()
     app_yml = ctx.obj['APP_YAML']
@@ -123,6 +184,16 @@ def prepareDockerfile(ctx):
 
 
 def initAppDir(ctx, app_dir):
+    """Initialize the application directory.
+
+    Set the application directory in ctx, if not done yet,
+    and load and validate the application yaml configuration.
+    Exits the whole program on failure.
+
+    Args:
+        ctx (dict): The click context.
+        app_dir (Path): The path to the application directory.
+    """
     if 'APP_DIR' in ctx.obj:
         return
     ctx.obj['APP_DIR'] = app_dir
@@ -139,6 +210,13 @@ def initAppDir(ctx, app_dir):
 
 
 def cleanAppDir(app_dir):
+    """Clean preparation artifacts.
+
+    Deletes the 'package.json' and 'Dockerfile' files in application directory.
+
+    Args:
+        app_dir (Path): The application directory.
+    """
     try:
         Path(app_dir, 'package.json').resolve(strict=True).unlink()
     except Exception:
@@ -195,6 +273,22 @@ def prepare(ctx, app_dir, mod_dir):
 
 
 def buildDockerImage(client, repo, app_dir, app_yml):
+    """Build an docker image for the application.
+
+    Use the docker API to build an image for the application.
+
+    Args:
+        client (APIClient): The docker API client.
+        repo (str): The repository where to tag the image into.
+        app_dir (Path): The application directory.
+        app_yml (dict): The application yaml config.
+
+    Raises:
+        BuildError: If anything goes wrong while building.
+
+    Returns:
+        str: The image ID.
+    """
     img = None
     try:
         build_cfg = app_yml.get('build') or dict()
@@ -218,6 +312,20 @@ def buildDockerImage(client, repo, app_dir, app_yml):
 
 
 def tagDockerImage(client, img, repo, latest, app_yml):
+    """Tag an docker image.
+
+    Apply additional tags to an docker image.
+
+    Args:
+        client (APIClient): The docker API client.
+        img (str): The image ID.
+        repo (str): The image repository name.
+        latest (bool): Tag image with 'latest' if True.
+        app_yml (dict): The application yaml config.
+
+    Raises:
+        BuildError: If the image can not be tagged.
+    """
     build_cfg = app_yml.get('build') or dict()
     registry = build_cfg.get('registry')
     try:
