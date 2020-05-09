@@ -3,7 +3,7 @@ FROM manjarolinux/base:latest
 ARG THEIA_UID=1337
 
 RUN pacman -Syyuu --noconfirm && \
-    pacman -S --noconfirm yarn nvm tar grep awk wget git make python2 && \
+    pacman -S --noconfirm yarn nvm tar grep awk wget git make gcc python2 vim && \
     pacman -Scc --noconfirm
 
 RUN useradd -s /bin/bash -m -d /home/theia -U -u $THEIA_UID -c '' theia && \

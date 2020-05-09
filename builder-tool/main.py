@@ -101,12 +101,15 @@ def prepareDockerfile(ctx):
     scripts = list()
     app_yml = ctx.obj['APP_YAML']
     app_dir = ctx.obj['APP_DIR']
+    params = app_yml.get('parameters') or dict()
 
     for mod in app_yml.get('modules') or ():
+        mod_params = params.get(mod) or dict()
         resolveDockerfile(Path(ctx.obj['MOD_DIR'], 'modules', mod, app_yml['app']['base']).resolve(),
-                          scripts, app_yml.get('parameters', {}).get(mod))
+                          scripts, mod_params)
+
     resolveDockerfile(Path(app_dir, 'module').resolve(),
-                      scripts, app_yml.get('parameters', {}).get(mod))
+                      scripts, params.get('module') or dict())
 
     fpath = Path(app_dir, 'Dockerfile').resolve()
     try:
@@ -194,11 +197,12 @@ def prepare(ctx, app_dir, mod_dir):
 def buildDockerImage(client, repo, app_dir, app_yml):
     img = None
     try:
+        build_cfg = app_yml.get('build') or dict()
         stream = client.build(
             decode=True,
             path=app_dir,
             tag=("%s:%s" % (repo, app_yml['app']['version'])),
-            buildargs=app_yml.get('build', {}).get('arguments')
+            buildargs=build_cfg.get('arguments')
         )
         for chunk in stream:
             if 'stream' in chunk:
@@ -214,7 +218,8 @@ def buildDockerImage(client, repo, app_dir, app_yml):
 
 
 def tagDockerImage(client, img, repo, latest, app_yml):
-    registry = app_yml.get('build', {}).get('registry')
+    build_cfg = app_yml.get('build') or dict()
+    registry = build_cfg.get('registry')
     try:
         if registry:
             client.tag(img, "%s/%s" % (registry, repo), "%s" %
