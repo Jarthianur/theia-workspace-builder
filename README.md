@@ -1,54 +1,88 @@
-# theia-workspace-builder
+# theia workspace builder
 
-**This readme currently describes what I want to achieve by this project.**
+Theia workspace builder (TWB) is an attempt to unify the process of provisioning, and building of development environments featuring [eclipse-theia](https://github.com/eclipse-theia/theia), as docker containers.
+*TWB* consists of different atomic setups, so called modules, alongside the actual builder tool.
+In short, *TWB* allows to pack those modules together from a simple configuration file into a workspace of your needs.
 
-This is an attempt to unify the creation and provisioning of theia docker workspaces.
-It is based on https://github.com/theia-ide/theia-apps, which consists of different example setups for language specific workspaces with eclipse theia IDE.
-The idea of this project is to provide all different setups as atomic modules, that can be included into a workspace application.
+## How it works
 
-## how it should look like
+Basically every workspace is broken down into a base system, and independant modules that take of certain languages, or utilities.
+Each module provides just the setup steps and dependencies, which are required for its purpose.
+By utilizing jinja templates, *TWB* merges the base, and all configured modules into a single workspace setup, which can be built as container.
 
-In the end it would be great to have a utility script that allows for easy selection of modules, and baking them together into the final docker image.
-Therefor we need a directory structure where every directory contains language / environment specific setups and resources, including the installation part for dockerfiles.
-To achieve the merge and build process, we need a tool that accepts required flags to specify the wanted environment setup.
+Every module, and the base setup as well, consists of a system dependent Dockerfile template, and a package.json file.
+While all installation and setup steps are placed in the Dockerfile, the package.json contains dependencies and plugins required by theia.
+By providing a system dependent Dockerfile, it is possible to support multiple base systems, where you can choose one of in your workspace configuration.
 
-## current setup
+The builder tool is a utility, that does all the work for you, and bundles your workspace setup into a ready-to-use docker image.
 
-In the project root are directories inside *modules*.
-These modules may contain a
+## Getting started
 
-+ Dockerfile
-+ package.json
+An example workspace setup can be found in [example-ws](example-ws/).
 
-The modules should be designed in a non conflicting way to each other.
+### Define a workspace
 
-To define an application a new directory is created, which contains an **application.yaml** file.
-Additionally there may be a Dockerfile and a package.json, where app specific stuff can be included, in a subdirectory called **module**.
-Resources like settings.json can be placed there in the app directory.
-The provisioning tool takes the base module and interpolates every module specified in the application.yaml into a resulting Dockerfile and package.json.
-From there the application can be built using docker cli.
+To define a workspace, all you need to do is to create a directory, and place an *application.yaml* file in there.
+It is not important, where you create this directory, but recommended to place it inside your clone of this repository, as it allows the most easy use.
+All workspace specific files go in this directory as well.
 
-## Current application.yaml layout
+### The application.yaml
+
+A minimal application.yaml looks like the following.
 
 ```yaml
 app:
-  name: theia-example
-  version: "0.0.4"
+  name: example-ws
+  version: "0.0.1"
   org: my-org
   license: "Apache-2.0"
-  title: "Example Theia Application"
+  title: "Example Theia Workspace"
   base: manjaro
-parameters:
-  cpp:
-    with_boost: yes
-    with_omp: yes
-build:
-  registry: my-reg
 modules:
-  - cpp
-  - sys-manager
-  - python
+  - ...
 ```
+
+Apart from *modules*, *app* and all keys under it are mandatory.
+While *modules* itself is optional, it would be pointless to have a workspace without any language setup.
+To include a module in your workspace, just add it to the list of *modules*.
+
+It is also possible to set parameters for your workspace, and configure even more, like described in []().
+
+### Prepare and build your workspace
+
+There is a python tool in *builder-tool*, which does all that for you.
+This tool can either be called directly or first installed via setuptools.
+Run it with `--help` to get more information about its usage.
+
+#### Preparation
+
+Run the builder tool with **prepare** command, to generate the final Dockerfile and package.json files inside your workspace definition directory.
+The prepare command must always be ran before build.
+
+```bash
+python3 builder-tool/main.py prepare example-ws/
+```
+
+#### Build
+
+Run the builder tool with **build** command, to build the docker image.
+The build command might require *root* permissions, in order to talk to docker daemon.
+
+```bash
+python3 builder-tool/main.py build example-ws/
+```
+
+### Run your workspace container
+
+In order to run the workspace as container, with support for git over ssh, run something like the following command.
+
+```bash
+docker run --init --security-opt seccomp=unconfined -dit --restart=always -p 3000:3000 -v "$(pwd)/my-project/:/home/project:cached" -v "$(pwd)/.ssh:/home/theia/.ssh:ro" user/example-ws
+```
+
+## Complete application.yaml schema
+
+## How to create modules
 
 ## Currently supported base systems
 
