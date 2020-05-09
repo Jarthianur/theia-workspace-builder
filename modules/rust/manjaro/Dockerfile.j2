@@ -6,5 +6,7 @@ RUN pacman -S --noconfirm \
     pacman -Scc --noconfirm
 
 RUN su - theia -c "rustup default {{ parameters.rust_channel|default('stable') }}" && \
-    su - theia -c "rustup component add rust-src rust-docs rls rust-analysis rustfmt clippy" && \
+    su - theia -c "rustup component add rust-src rust-docs rls rust-analysis rustfmt clippy" 
+    {%- if parameters.with_racer is true %} && \
     su - theia -c "cargo +{{ parameters.rust_channel|default('stable') }} install racer"
+    {%- endif %}

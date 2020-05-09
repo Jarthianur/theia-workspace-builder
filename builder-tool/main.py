@@ -197,11 +197,12 @@ def prepare(ctx, app_dir, mod_dir):
 def buildDockerImage(client, repo, app_dir, app_yml):
     img = None
     try:
+        build_cfg = app_yml.get('build') or dict()
         stream = client.build(
             decode=True,
             path=app_dir,
             tag=("%s:%s" % (repo, app_yml['app']['version'])),
-            buildargs=app_yml.get('build', {}).get('arguments')
+            buildargs=build_cfg.get('arguments')
         )
         for chunk in stream:
             if 'stream' in chunk:
@@ -217,7 +218,8 @@ def buildDockerImage(client, repo, app_dir, app_yml):
 
 
 def tagDockerImage(client, img, repo, latest, app_yml):
-    registry = app_yml.get('build', {}).get('registry')
+    build_cfg = app_yml.get('build') or dict()
+    registry = build_cfg.get('registry')
     try:
         if registry:
             client.tag(img, "%s/%s" % (registry, repo), "%s" %
