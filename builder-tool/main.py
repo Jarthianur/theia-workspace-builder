@@ -101,12 +101,15 @@ def prepareDockerfile(ctx):
     scripts = list()
     app_yml = ctx.obj['APP_YAML']
     app_dir = ctx.obj['APP_DIR']
+    params = app_yml.get('parameters') or dict()
 
     for mod in app_yml.get('modules') or ():
+        mod_params = params.get(mod) or dict()
         resolveDockerfile(Path(ctx.obj['MOD_DIR'], 'modules', mod, app_yml['app']['base']).resolve(),
-                          scripts, app_yml.get('parameters', {}).get(mod))
+                          scripts, mod_params)
+
     resolveDockerfile(Path(app_dir, 'module').resolve(),
-                      scripts, app_yml.get('parameters', {}).get(mod))
+                      scripts, params.get('module') or dict())
 
     fpath = Path(app_dir, 'Dockerfile').resolve()
     try:

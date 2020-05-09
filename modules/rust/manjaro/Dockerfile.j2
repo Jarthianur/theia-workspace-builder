@@ -5,5 +5,6 @@ RUN pacman -S --noconfirm \
       binutils && \
     pacman -Scc --noconfirm
 
-RUN rustup default stable && \
-    rustup component add rls rust-src rust-analysis
+RUN su - theia -c "rustup default {{ parameters.rust_channel|default('stable') }}" && \
+    su - theia -c "rustup component add rust-src rust-docs rls rust-analysis rustfmt clippy" && \
+    su - theia -c "cargo +{{ parameters.rust_channel|default('stable') }} install racer"
