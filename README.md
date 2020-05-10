@@ -1,5 +1,7 @@
 # theia workspace builder
 
+**Work in progress**
+
 Theia workspace builder (TWB) is an attempt to unify the process of provisioning, and building of development environments featuring [eclipse-theia](https://github.com/eclipse-theia/theia), as docker containers.
 *TWB* consists of different atomic setups, so called modules, alongside the actual builder tool.
 In short, *TWB* allows to pack those modules together from a simple configuration file into a workspace of your needs.
@@ -77,14 +79,41 @@ python3 builder-tool/main.py build example-ws/
 In order to run the workspace as container, with support for git over ssh, run something like the following command.
 
 ```bash
-docker run --init --security-opt seccomp=unconfined -dit --restart=always -p 3000:3000 -v "$(pwd)/my-project/:/home/project:cached" -v "$(pwd)/.ssh:/home/theia/.ssh:ro" user/example-ws
+docker run --init --security-opt seccomp=unconfined -dit --restart=always -p 3000:3000 -v "$(pwd)/my-project/:/home/project:cached" -v "$(pwd)/.ssh:/home/theia/.ssh:ro" my-org/example-ws
 ```
 
 ## Complete application.yaml schema
 
+In the below schema, `//` is used as comment, and everything in `()` is optional.
+
+```
+app:
+  name: <docker image name>
+  version: <version string>
+  org: <organisation name>
+  license: <license name>
+  title: <application title>
+  base: <base system name>
+(parameters): // map module names to their params
+  (<module name>):
+    <key-value entries for params used in template>
+(build):
+  (registry): <docker registry name>
+  (arguments): // args passed to docker build
+    <key-value entries>
+(modules):
+  <list of module names>
+```
+
 ## How to create modules
 
-## Currently supported base systems
+Every module has its own directory under *modules*, where the directory name denotes the module name.
+A module may contain a *package.json* file, with `dependencies` and `theiaPlugins`.
+A module may contain subdirectories named after the base system, which may contain one *Dockerfile.j2*.
+This Dockerfile template defines all installation steps for this module.
+Ideally a module contains also a readme file, to describe its purpose, and parameters.
+
+## Supported base systems
 
 |Base|Use Case|
 |--|--|
