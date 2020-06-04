@@ -272,7 +272,7 @@ def prepare(ctx, app_dir, mod_dir):
         fail("Failed to prepare the application! Cause: %s" % e)
 
 
-def buildDockerImage(client, repo, app_dir, app_yml):
+def buildDockerImage(client, repo, app_dir, app_yml, cache):
     """Build an docker image for the application.
 
     Use the docker API to build an image for the application.
@@ -282,6 +282,7 @@ def buildDockerImage(client, repo, app_dir, app_yml):
         repo (str): The repository where to tag the image into.
         app_dir (Path): The application directory.
         app_yml (dict): The application yaml config.
+        cache (boolean): The flag for enabling build cache.
 
     Raises:
         BuildError: If anything goes wrong while building.
@@ -293,6 +294,7 @@ def buildDockerImage(client, repo, app_dir, app_yml):
     try:
         build_cfg = app_yml.get('build') or dict()
         stream = client.build(
+            nocache=not cache,
             decode=True,
             path=app_dir,
             tag=("%s:%s" % (repo, app_yml['app']['version'])),
@@ -343,8 +345,10 @@ def tagDockerImage(client, img, repo, latest, app_yml):
 @click.argument('app_dir', type=click.Path(exists=True, file_okay=False))
 @click.option('--latest/--no-latest', 'latest', default=True,
               help="Additionally to the version tag, add a 'latest' tag to the image.")
+@click.option('--cache/--no-cache', 'cache', default=True,
+              help="Toggle use of docker build cache. This may result in package errors.")
 @click.pass_context
-def build(ctx, app_dir, latest):
+def build(ctx, app_dir, latest, cache):
     """Build the application.
     Prudoces a docker image for the application specified in APP_DIR.
     Assumes 'prepare' has been invoked successfully.
@@ -358,7 +362,7 @@ def build(ctx, app_dir, latest):
     logging.info("Building docker image for %s. This may take a while.", repo)
     img = None
     try:
-        img = buildDockerImage(client, repo, app_dir, app_yml)
+        img = buildDockerImage(client, repo, app_dir, app_yml, cache)
     except OSError:
         fail("Failed to connect to docker daemon!")
     except BuildError as e:
