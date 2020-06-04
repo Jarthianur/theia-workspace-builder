@@ -345,10 +345,10 @@ def tagDockerImage(client, img, repo, latest, app_yml):
 @click.argument('app_dir', type=click.Path(exists=True, file_okay=False))
 @click.option('--latest/--no-latest', 'latest', default=True,
               help="Additionally to the version tag, add a 'latest' tag to the image.")
-@click.option('--cache/--no-cache', 'build_cache', default=True,
+@click.option('--cache/--no-cache', 'cache', default=True,
               help="Toggle use of docker build cache. This may result in package errors.")
 @click.pass_context
-def build(ctx, app_dir, latest, build_cache):
+def build(ctx, app_dir, latest, cache):
     """Build the application.
     Prudoces a docker image for the application specified in APP_DIR.
     Assumes 'prepare' has been invoked successfully.
@@ -362,7 +362,7 @@ def build(ctx, app_dir, latest, build_cache):
     logging.info("Building docker image for %s. This may take a while.", repo)
     img = None
     try:
-        img = buildDockerImage(client, repo, app_dir, app_yml, build_cache)
+        img = buildDockerImage(client, repo, app_dir, app_yml, cache)
     except OSError:
         fail("Failed to connect to docker daemon!")
     except BuildError as e:
