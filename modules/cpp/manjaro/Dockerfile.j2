@@ -1,4 +1,4 @@
-RUN pacman -S --noconfirm \
+RUN pacman -S --needed --noconfirm \
       clang
       {%- if parameters.with_omp is true %} \
       openmp openmpi
