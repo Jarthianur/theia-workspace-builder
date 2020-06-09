@@ -1,4 +1,4 @@
-RUN pacman -S --noconfirm \
+RUN pacman -S --needed --noconfirm \
         python-pip && \
     pip install --upgrade pip && \
     pip install python-language-server flake8 autopep8 pylint rope && \
