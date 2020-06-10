@@ -1,0 +1,8 @@
+{
+    "dependencies": {
+    },
+    "theiaPlugins": {
+        "vscode-builtin-go": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/go-1.39.1-prel.vsix",
+        "vscode-go": "https://github.com/microsoft/vscode-go/releases/download/0.12.0/Go-0.12.0.vsix"
+    }
+}
