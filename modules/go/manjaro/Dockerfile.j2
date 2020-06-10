@@ -1,0 +1,35 @@
+RUN pacman -S --needed --noconfirm \
+      make \
+      gdb \
+      binutils \
+      go && \
+    pacman -Scc
+
+RUN su - theia -c "go get -u -v github.com/mdempsky/gocode" && \
+    su - theia -c "go get -u -v github.com/uudashr/gopkgs/cmd/gopkgs" && \
+    su - theia -c "go get -u -v github.com/ramya-rao-a/go-outline" && \
+    su - theia -c "go get -u -v github.com/acroca/go-symbols" && \
+    su - theia -c "go get -u -v golang.org/x/tools/cmd/guru" && \
+    su - theia -c "go get -u -v golang.org/x/tools/cmd/gorename" && \
+    su - theia -c "go get -u -v github.com/fatih/gomodifytags" && \
+    su - theia -c "go get -u -v github.com/haya14busa/goplay/cmd/goplay" && \
+    su - theia -c "go get -u -v github.com/josharian/impl" && \
+    su - theia -c "go get -u -v github.com/tylerb/gotype-live" && \
+    su - theia -c "go get -u -v github.com/rogpeppe/godef" && \
+    su - theia -c "go get -u -v github.com/zmb3/gogetdoc" && \
+    su - theia -c "go get -u -v golang.org/x/tools/cmd/goimports" && \
+    su - theia -c "go get -u -v github.com/sqs/goreturns" && \
+    su - theia -c "go get -u -v winterdrache.de/goformat/goformat" && \
+    su - theia -c "go get -u -v golang.org/x/lint/golint" && \
+    su - theia -c "go get -u -v github.com/cweill/gotests/..." && \
+    su - theia -c "go get -u -v github.com/alecthomas/gometalinter" && \
+    su - theia -c "go get -u -v honnef.co/go/tools/..." && \
+    su - theia -c "GO111MODULE=on go get github.com/golangci/golangci-lint/cmd/golangci-lint" && \
+    su - theia -c "go get -u -v github.com/mgechev/revive" && \
+    su - theia -c "go get -u -v github.com/sourcegraph/go-langserver" && \
+    su - theia -c "go get -u -v github.com/go-delve/delve/cmd/dlv" && \
+    su - theia -c "go get -u -v github.com/davidrjenni/reftools/cmd/fillstruct" && \
+    su - theia -c "go get -u -v github.com/godoctor/godoctor"
+
+RUN su - theia -c "go get -u -v -d github.com/stamblerre/gocode" && \
+    su - theia -c "go build -o /home/theia/go/bin/gocode-gomod github.com/stamblerre/gocode"

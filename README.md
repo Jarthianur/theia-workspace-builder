@@ -2,18 +2,17 @@
 
 **Work in progress**
 
-Theia workspace builder (TWB) is an attempt to unify the process of provisioning, and building of development environments featuring [eclipse-theia](https://github.com/eclipse-theia/theia), as docker containers.
+Theia workspace builder (TWB) unifies the process of provisioning, and building of development environments featuring [eclipse-theia](https://github.com/eclipse-theia/theia), as docker containers.
 *TWB* consists of different atomic setups, so called modules, alongside the actual builder tool.
 In short, *TWB* allows to pack those modules together from a simple configuration file into a workspace of your needs.
 
 ## How it works
 
-Basically every workspace is broken down into a base system, and independant modules that take of certain languages, or utilities.
-Each module provides just the setup steps and dependencies, which are required for its purpose.
-By utilizing jinja templates, *TWB* merges the base, and all configured modules into a single workspace setup, which can be built as container.
+Basically every workspace is broken down into a base system, and independant modules that take care of certain languages, or utilities.
+By utilizing jinja templates, *TWB* merges the base, and all configured modules into a single workspace setup, which can be built as docker image.
 
 Every module, and the base setup as well, consists of a system dependent Dockerfile template, and a package.json file.
-While all installation and setup steps are placed in the Dockerfile, the package.json contains dependencies and plugins required by theia.
+While all installation steps are placed in the Dockerfile, the package.json contains dependencies and plugins required by theia.
 By providing a system dependent Dockerfile, it is possible to support multiple base systems, where you can choose one of in your workspace configuration.
 
 The builder tool is a utility, that does all the work for you, and bundles your workspace setup into a ready-to-use docker image.
@@ -68,7 +67,7 @@ python3 builder-tool/main.py prepare example-ws/
 #### Build
 
 Run the builder tool with **build** command, to build the docker image.
-The build command might require *root* permissions, in order to talk to docker daemon.
+The build command might require *root* permissions, in order to talk to the docker daemon.
 
 ```bash
 python3 builder-tool/main.py build example-ws/
