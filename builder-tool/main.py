@@ -175,7 +175,8 @@ def prepareDockerfile(ctx):
     fpath = Path(app_dir, 'Dockerfile').resolve()
     try:
         with fpath.open('w') as res:
-            res.write(dock_tmpl.render(scripts=scripts))
+            res.write(dock_tmpl.render(scripts=scripts,
+                                       base_tag=app_yml['app'].get('base_tag') or 'latest'))
     except jinja2.TemplateError as e:
         raise PrepareError(
             "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
