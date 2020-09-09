@@ -4,6 +4,6 @@
     },
     "theiaPlugins": {
         "vscode-clangd": "https://open-vsx.org/api/llvm-vs-code-extensions/vscode-clangd/0.1.5/file/llvm-vs-code-extensions.vscode-clangd-0.1.5.vsix",
-        "vscode-builtin-cpp": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/cpp-1.39.1-prel.vsix"
+        "vscode-builtin-cpp": "https://open-vsx.org/api/vscode/cpp/1.44.2/file/vscode.cpp-1.44.2.vsix"
     }
 }
