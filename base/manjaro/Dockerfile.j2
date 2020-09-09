@@ -21,8 +21,8 @@ WORKDIR /home/theia
 ADD package.json ./package.json
 
 RUN source /usr/share/nvm/init-nvm.sh && \
-    nvm install 10 && \
-    nvm use 10 && \
+    nvm install 12 && \
+    nvm use 12 && \
     mkdir bin && \
     ln -s "$(echo -n $PATH | tr ':' '\n' | grep nvm)/node" /home/theia/bin/node && \
     npm config set python /usr/bin/python2 --global && \

@@ -1,8 +1,7 @@
 {
-    "dependencies": {
-    },
+    "dependencies": {},
     "theiaPlugins": {
-        "vscode-builtin-python": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/python-1.39.1-prel.vsix",
+        "vscode-builtin-python": "https://open-vsx.org/api/vscode/python/1.44.2/file/vscode.python-1.44.2.vsix",
         "vscode-python": "https://github.com/microsoft/vscode-python/releases/download/2020.1.58038/ms-python-release.vsix"
     }
 }
