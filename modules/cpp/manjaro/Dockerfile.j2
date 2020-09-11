@@ -1,15 +1,14 @@
 RUN pacman -S --needed --noconfirm \
       clang
-      {%- if parameters.with_omp is true %} \
+      {%- if parameters.with_omp is sameas true %} \
       openmp openmpi
       {%- endif %} \
       gcc \
       cmake \
       make \
       gdb \
-      valgrind \
-      binutils
-      {%- if parameters.with_boost is true %} \
+      valgrind
+      {%- if parameters.with_boost is sameas true %} \
       boost boost-libs
       {%- endif %} && \
     pacman -Scc --noconfirm

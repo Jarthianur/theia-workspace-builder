@@ -118,7 +118,7 @@ def preparePackageJson(ctx):
 
 
 def resolveDockerfile(fpath, scripts, params):
-    """Resolve installation setps from a Dockerfile template.
+    """Resolve installation steps from a Dockerfile template.
 
     Read a 'Dockerfile.j2' template file, and process it as template.
     The resulting Dockerfile part is stored into scripts.
@@ -135,8 +135,7 @@ def resolveDockerfile(fpath, scripts, params):
         logging.warning("Could not find [%s]." % fpath)
         return
     try:
-        env = jinja2.Environment(loader=jinja2.FileSystemLoader(
-            fpath))
+        env = jinja2.Environment(loader=jinja2.FileSystemLoader(str(fpath)))
         dock = env.get_template('Dockerfile.j2')
         scripts.append(dock.render(parameters=params))
     except jinja2.TemplateError as e:
@@ -175,7 +174,8 @@ def prepareDockerfile(ctx):
     fpath = Path(app_dir, 'Dockerfile').resolve()
     try:
         with fpath.open('w') as res:
-            res.write(dock_tmpl.render(scripts=scripts))
+            res.write(dock_tmpl.render(scripts=scripts,
+                                       base_tag=app_yml['app'].get('base_tag') or 'latest'))
     except jinja2.TemplateError as e:
         raise PrepareError(
             "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
@@ -257,8 +257,8 @@ def prepare(ctx, app_dir, mod_dir):
     try:
         ctx.obj['TMPL_ENV'] = jinja2.Environment(
             loader=jinja2.FileSystemLoader(
-                [Path(ctx.obj['MOD_DIR'], 'base').resolve(strict=True),
-                 Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(strict=True)]
+                [str(Path(ctx.obj['MOD_DIR'], 'base').resolve(strict=True)),
+                 str(Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(strict=True))]
             ))
         preparePackageJson(ctx)
         prepareDockerfile(ctx)

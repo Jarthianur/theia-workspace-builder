@@ -1,12 +1,11 @@
 RUN pacman -S --needed --noconfirm \
       rustup \
       make \
-      gdb \
-      binutils && \
+      gdb && \
     pacman -Scc --noconfirm
 
 RUN su - theia -c "rustup default {{ parameters.rust_channel|default('stable') }}" && \
     su - theia -c "rustup component add rust-src rust-docs rls rust-analysis rustfmt clippy" 
-    {%- if parameters.with_racer is true %} && \
+    {%- if parameters.with_racer is sameas true %} && \
     su - theia -c "cargo +{{ parameters.rust_channel|default('stable') }} install racer"
     {%- endif %}
