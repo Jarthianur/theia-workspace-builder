@@ -3,6 +3,9 @@ app:
   version: "0.0.1"
   license: "Apache-2.0"
   title: "Example Theia Application"
+  org: my-org
+  base: manjaro
 modules:
   - cpp
   - sys-manager
+  - themes
