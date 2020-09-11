@@ -7,8 +7,7 @@ RUN pacman -S --needed --noconfirm \
       cmake \
       make \
       gdb \
-      valgrind \
-      binutils
+      valgrind
       {%- if parameters.with_boost is sameas true %} \
       boost boost-libs
       {%- endif %} && \
