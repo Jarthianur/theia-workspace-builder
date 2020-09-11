@@ -93,6 +93,7 @@ app:
   license: <license name>
   title: <application title>
   base: <base system name>
+  (base_tag): <base system tag, default is 'latest'>
 (parameters): // map module names to their params
   (<module name>):
     <key-value entries for params used in template>
@@ -114,6 +115,6 @@ Ideally a module contains also a readme file, to describe its purpose, and param
 
 ## Supported base systems
 
-|Base|Use Case|
-|--|--|
-|manjaro|Cutting edge development platform.|
+| Base    | Use Case                           |
+| ------- | ---------------------------------- |
+| manjaro | Cutting edge development platform. |
