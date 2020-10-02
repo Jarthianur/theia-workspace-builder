@@ -12,3 +12,8 @@ RUN pacman -S --needed --noconfirm \
       boost boost-libs
       {%- endif %} && \
     pacman -Scc --noconfirm
+
+RUN wget -q https://github.com/linux-test-project/lcov/releases/download/v1.15/lcov-1.15.tar.gz && \
+    tar xf lcov-1.15.tar.gz && \
+    cp -n lcov-1.15/bin/* /usr/local/bin/ && \
+    rm -rf lcov-1.15*
