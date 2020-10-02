@@ -44,7 +44,9 @@ RUN source /usr/share/nvm/init-nvm.sh && \
     yarn cache clean
 
 ENV THEIA_DEFAULT_PLUGINS=local-dir:/home/theia/plugins \
-    SHELL=/bin/bash
+    SHELL=/bin/bash \
+    VISUAL=vim \
+    EDITOR=vim
 
 EXPOSE 3000
 
