@@ -1,8 +1,0 @@
-{
-    "dependencies": {
-    },
-    "theiaPlugins": {
-        "markdown-preview-mermaid": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/bierner/vsextensions/markdown-mermaid/1.8.1/vspackage",
-        "mermaid-markdown-syntax": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/bpruitt-goddard/vsextensions/mermaid-markdown-syntax-highlighting/1.0.3/vspackage"
-    }
-}
