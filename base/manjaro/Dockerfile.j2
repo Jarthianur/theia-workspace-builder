@@ -29,7 +29,7 @@ RUN source /usr/share/nvm/init-nvm.sh && \
     npm config set python /usr/bin/python2 --global && \
     npm config set python /usr/bin/python2
 
-ENV PATH=/home/theia/bin:$PATH
+ENV PATH=/home/theia/bin:/home/theia/.local/bin:$PATH
 
 RUN source /usr/share/nvm/init-nvm.sh && \
     yarn --pure-lockfile && \
