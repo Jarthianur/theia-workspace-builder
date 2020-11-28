@@ -1,0 +1,6 @@
+{
+  "dependencies": {},
+  "theiaPlugins": {
+    "vscode-builtin-hlsl": "https://open-vsx.org/api/vscode/hlsl/1.51.1/file/vscode.hlsl-1.51.1.vsix"
+  }
+}

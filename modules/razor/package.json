@@ -1,0 +1,6 @@
+{
+  "dependencies": {},
+  "theiaPlugins": {
+    "vscode-builtin-razor": "https://open-vsx.org/api/vscode/razor/1.51.1/file/vscode.razor-1.51.1.vsix"
+  }
+}

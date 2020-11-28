@@ -1,0 +1,11 @@
+{
+  "dependencies": {},
+  "theiaPlugins": {
+    "vscode-builtin-emmet": "https://open-vsx.org/api/vscode/emmet/1.51.1/file/vscode.emmet-1.51.1.vsix",
+    "vscode-builtin-javascript": "https://open-vsx.org/api/vscode/javascript/1.51.1/file/vscode.javascript-1.51.1.vsix",
+    "vscode-builtin-js-debug": "https://open-vsx.org/api/ms-vscode/js-debug/1.51.0/file/ms-vscode.js-debug-1.51.0.vsix",
+    "vscode-builtin-typescript": "https://open-vsx.org/api/vscode/typescript/1.51.1/file/vscode.typescript-1.51.1.vsix",
+    "vscode-builtin-typescript-language-features": "https://open-vsx.org/api/vscode/typescript-language-features/1.51.1/file/vscode.typescript-language-features-1.51.1.vsix",
+    "vscode-eslint": "https://open-vsx.org/api/dbaeumer/vscode-eslint/2.1.8/file/dbaeumer.vscode-eslint-2.1.8.vsix"
+  }
+}

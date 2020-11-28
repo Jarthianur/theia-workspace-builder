@@ -1,0 +1,6 @@
+{
+  "dependencies": {},
+  "theiaPlugins": {
+    "vscode-builtin-java": "https://open-vsx.org/api/vscode/java/1.51.1/file/vscode.java-1.51.1.vsix"
+  }
+}
