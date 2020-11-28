@@ -1,0 +1,6 @@
+{
+  "dependencies": {},
+  "theiaPlugins": {
+    "vscode-builtin-shaderlab": "https://open-vsx.org/api/vscode/shaderlab/1.51.1/file/vscode.shaderlab-1.51.1.vsix"
+  }
+}
