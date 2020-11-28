@@ -17,6 +17,8 @@ RUN useradd -s /bin/bash -m -d /home/theia -U -u $THEIA_UID -c '' theia && \
 {{ s }}
 {% endfor %}
 
+RUN chown -R theia:theia /home/theia
+
 USER theia
 WORKDIR /home/theia
 ADD package.json ./package.json
