@@ -4,7 +4,6 @@
   },
   "theiaPlugins": {
     "vscode-clangd": "https://open-vsx.org/api/llvm-vs-code-extensions/vscode-clangd/0.1.7/file/llvm-vs-code-extensions.vscode-clangd-0.1.7.vsix",
-    "vscode-builtin-cpp": "https://open-vsx.org/api/vscode/cpp/1.51.1/file/vscode.cpp-1.51.1.vsix",
     "doxygen-generator": "https://open-vsx.org/api/cschlosser/doxdocgen/1.1.0/file/cschlosser.doxdocgen-1.1.0.vsix"
   }
 }
