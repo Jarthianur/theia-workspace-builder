@@ -12,7 +12,6 @@ parameters:
 build:
   registry: "my-registry.my.org"
 modules:
-  - sys-manager
-  - go
+  - pkg-manager
   - rust
   - cpp
