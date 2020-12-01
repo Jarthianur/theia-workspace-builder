@@ -43,7 +43,8 @@ RUN source /usr/share/nvm/init-nvm.sh && \
     echo *.ts.map >> .yarnclean && \
     echo *.spec.* >> .yarnclean && \
     yarn autoclean --force && \
-    yarn cache clean
+    yarn cache clean && \
+    rm -f .yarnclean
 
 ENV THEIA_DEFAULT_PLUGINS=local-dir:/home/theia/plugins \
     SHELL=/bin/bash \
