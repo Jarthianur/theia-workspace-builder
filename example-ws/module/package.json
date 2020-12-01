@@ -1,1 +1,6 @@
-{}
+{
+  "dependencies": {},
+  "theiaPlugins": {
+    "custom-theme": "https://open-vsx.org/api/.../example.vsix"
+  }
+}

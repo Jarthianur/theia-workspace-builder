@@ -131,7 +131,7 @@ def resolveDockerfile(fpath, scripts, params):
     Raises:
         PrepareError: If the template is invalid, or not readable.
     """
-    if not Path(fpath).is_dir():
+    if not (Path(fpath).is_dir() and Path(fpath, 'Dockerfile.j2').is_file()):
         logging.warning("Could not find [%s]." % fpath)
         return
     try:
@@ -227,8 +227,8 @@ def cleanAppDir(app_dir):
         pass
 
 
-@click.group()
-@click.pass_context
+@ click.group()
+@ click.pass_context
 def cli(ctx):
     """Build custom Eclipse Theia workspaces (applications) from language / environment modules.
     An application is defined by an 'application.yaml' file inside the APP_DIR directory.
@@ -238,13 +238,14 @@ def cli(ctx):
         format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO)
 
 
-@cli.command()
-@click.argument('app_dir', type=click.Path(exists=True, file_okay=False))
-@click.option('-m', '--module-dir', 'mod_dir',  type=click.Path(exists=True, file_okay=False),
-              help="Path to the theia-workspace-builder root. The 'modules', and 'base' directories are placed there.")
-@click.pass_context
+@ cli.command()
+@ click.argument('app_dir', type=click.Path(exists=True, file_okay=False))
+@ click.option('-m', '--module-dir', 'mod_dir',  type=click.Path(exists=True, file_okay=False),
+               help="Path to the theia-workspace-builder root. The 'modules', and 'base' directories are placed there.")
+@ click.pass_context
 def prepare(ctx, app_dir, mod_dir):
     """Prepare the application build.
+
     Generates a Dockerfile and package.json inside APP_DIR.
     As 'prepare' should not run as privileged user, it needs to be invoked separately before 'build'.
     """
@@ -341,20 +342,23 @@ def tagDockerImage(client, img, repo, latest, app_yml):
         raise BuildError(e)
 
 
-@cli.command()
-@click.argument('app_dir', type=click.Path(exists=True, file_okay=False))
-@click.option('--latest/--no-latest', 'latest', default=True,
-              help="Additionally to the version tag, add a 'latest' tag to the image.")
-@click.option('--cache/--no-cache', 'cache', default=True,
-              help="Toggle use of docker build cache. This may result in package errors.")
-@click.pass_context
-def build(ctx, app_dir, latest, cache):
+@ cli.command()
+@ click.argument('app_dir', type=click.Path(exists=True, file_okay=False))
+@ click.option('--latest/--no-latest', 'latest', default=True,
+               help="Additionally to the version tag, add a 'latest' tag to the image.")
+@ click.option('--cache/--no-cache', 'cache', default=True,
+               help="Toggle use of docker build cache. Using cache may result in package errors.")
+@click.option('--endpoint', 'endpoint', type=click.STRING, default='unix://var/run/docker.sock', show_default=True,
+              help="Docker API endpoint URI.")
+@ click.pass_context
+def build(ctx, app_dir, latest, cache, endpoint):
     """Build the application.
+
     Prudoces a docker image for the application specified in APP_DIR.
     Assumes 'prepare' has been invoked successfully.
     """
     initAppDir(ctx, app_dir)
-    client = docker.APIClient(base_url='unix://var/run/docker.sock')
+    client = docker.APIClient(base_url=endpoint)
     app_yml = ctx.obj['APP_YAML']
     repo = "%s/%s" % (app_yml['app']['org'],
                       app_yml['app']['name'])

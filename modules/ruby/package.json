@@ -1,0 +1,6 @@
+{
+  "dependencies": {},
+  "theiaPlugins": {
+    "vscode-builtin-ruby": "https://open-vsx.org/api/vscode/ruby/1.51.1/file/vscode.ruby-1.51.1.vsix"
+  }
+}

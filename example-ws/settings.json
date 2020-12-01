@@ -1,4 +1,4 @@
 {
-    "workbench.iconTheme": "theia-file-icons",
-    "editor.minimap.enabled": false
+  "workbench.iconTheme": "theia-file-icons",
+  "editor.minimap.enabled": false
 }

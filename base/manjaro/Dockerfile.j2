@@ -17,6 +17,8 @@ RUN useradd -s /bin/bash -m -d /home/theia -U -u $THEIA_UID -c '' theia && \
 {{ s }}
 {% endfor %}
 
+RUN chown -R theia:theia /home/theia
+
 USER theia
 WORKDIR /home/theia
 ADD package.json ./package.json
@@ -29,7 +31,7 @@ RUN source /usr/share/nvm/init-nvm.sh && \
     npm config set python /usr/bin/python2 --global && \
     npm config set python /usr/bin/python2
 
-ENV PATH=/home/theia/bin:$PATH
+ENV PATH=/home/theia/bin:/home/theia/.local/bin:$PATH
 
 RUN source /usr/share/nvm/init-nvm.sh && \
     yarn --pure-lockfile && \
@@ -41,10 +43,13 @@ RUN source /usr/share/nvm/init-nvm.sh && \
     echo *.ts.map >> .yarnclean && \
     echo *.spec.* >> .yarnclean && \
     yarn autoclean --force && \
-    yarn cache clean
+    yarn cache clean && \
+    rm -f .yarnclean
 
 ENV THEIA_DEFAULT_PLUGINS=local-dir:/home/theia/plugins \
-    SHELL=/bin/bash
+    SHELL=/bin/bash \
+    VISUAL=vim \
+    EDITOR=vim
 
 EXPOSE 3000
 

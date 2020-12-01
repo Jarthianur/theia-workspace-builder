@@ -1,3 +1,8 @@
 ADD settings.json /home/theia/.theia/
-RUN chown -R theia:theia /home/theia
+ADD .gitconfig /home/theia/
+
+RUN pacman -S --needed --noconfirm \
+      python-pip && \
+    pacman -Scc --noconfirm
+RUN su - theia -c "pip install --user compiledb"
 RUN echo "{{ parameters.echo }}"

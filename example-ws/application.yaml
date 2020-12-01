@@ -12,5 +12,6 @@ parameters:
 build:
   registry: "my-registry.my.org"
 modules:
-  - themes
-  - sys-manager
+  - pkg-manager
+  - rust
+  - cpp

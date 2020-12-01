@@ -18,7 +18,7 @@ from setuptools import setup
 
 setup(
     name='tws_builder',
-    version='0.3',
+    version='1.0',
     py_modules=['tws_builder'],
     install_requires=[
         'Click',

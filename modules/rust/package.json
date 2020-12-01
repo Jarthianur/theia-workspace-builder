@@ -1,9 +1,9 @@
 {
-    "dependencies": {
-        "@theia/cpp-debug": "next"
-    },
-    "theiaPlugins": {
-        "rust-lang": "https://open-vsx.org/api/rust-lang/rust/0.7.8/file/rust-lang.rust-0.7.8.vsix",
-        "vscode-builtin-rust": "https://open-vsx.org/api/vscode/rust/1.48.2/file/vscode.rust-1.48.2.vsix"
-    }
+  "dependencies": {
+    "@theia/cpp-debug": "next"
+  },
+  "theiaPlugins": {
+    "vscode-builtin-rust": "https://open-vsx.org/api/vscode/rust/1.51.1/file/vscode.rust-1.51.1.vsix",
+    "rust-lang": "https://open-vsx.org/api/rust-lang/rust/0.7.8/file/rust-lang.rust-0.7.8.vsix"
+  }
 }
