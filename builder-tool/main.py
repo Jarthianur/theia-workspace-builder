@@ -93,11 +93,21 @@ def preparePackageJson(ctx):
                       something goes wrong while resolving files,
                       or the resulting 'package.json' file can not be written.
     """
-    pkg_tmpl = ctx.obj['TMPL_ENV'].get_template('package.json.j2')
+    pkg_conf = dict()
     deps = dict()
     plugs = dict()
     app_yml = ctx.obj['APP_YAML']
     app_dir = ctx.obj['APP_DIR']
+
+    try:
+        fpath = Path(ctx.obj['MOD_DIR'], 'base',
+                     'package.json').resolve(strict=True)
+        with fpath.open('r') as tmpl:
+            pkg_conf = json.load(tmpl)
+    except json.JSONDecodeError as e:
+        raise PrepareError("Invalid JSON in [%s]! Cause: %s" % (fpath, e))
+    except OSError as e:
+        raise PrepareError("File at [%s] not readable! Cause: %s" % (fpath, e))
 
     for mod in app_yml.get('modules') or ():
         resolvePackageJson(Path(ctx.obj['MOD_DIR'], 'modules', mod, 'package.json').resolve(),
@@ -105,14 +115,17 @@ def preparePackageJson(ctx):
     resolvePackageJson(Path(app_dir, 'module', 'package.json').resolve(),
                        deps, plugs)
 
+    pkg_conf['name'] = '@theia/' + app_yml['app']['name']
+    pkg_conf['version'] = app_yml['app']['version']
+    pkg_conf['license'] = app_yml['app']['license']
+    pkg_conf['theia']['frontend']['config']['applicationName'] = app_yml['app']['title']
+    pkg_conf['dependencies'].update(deps)
+    pkg_conf['theiaPlugins'].update(plugs)
+
     fpath = Path(app_dir, 'package.json').resolve()
     try:
         with fpath.open('w') as res:
-            res.write(pkg_tmpl.render(app=app_yml['app'], package={
-                'dependencies': deps.items(), 'theiaPlugins': plugs.items()}))
-    except jinja2.TemplateError as e:
-        raise PrepareError(
-            "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
+            json.dump(pkg_conf, res, indent=2, sort_keys=True)
     except OSError as e:
         raise PrepareError("File at [%s] not writable! Cause: %s" % (fpath, e))
 
@@ -258,8 +271,8 @@ def prepare(ctx, app_dir, mod_dir):
     try:
         ctx.obj['TMPL_ENV'] = jinja2.Environment(
             loader=jinja2.FileSystemLoader(
-                [str(Path(ctx.obj['MOD_DIR'], 'base').resolve(strict=True)),
-                 str(Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(strict=True))]
+                str(Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(
+                    strict=True))
             ))
         preparePackageJson(ctx)
         prepareDockerfile(ctx)
