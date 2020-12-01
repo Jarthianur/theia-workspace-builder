@@ -245,6 +245,7 @@ def cli(ctx):
 @ click.pass_context
 def prepare(ctx, app_dir, mod_dir):
     """Prepare the application build.
+
     Generates a Dockerfile and package.json inside APP_DIR.
     As 'prepare' should not run as privileged user, it needs to be invoked separately before 'build'.
     """
@@ -347,11 +348,12 @@ def tagDockerImage(client, img, repo, latest, app_yml):
                help="Additionally to the version tag, add a 'latest' tag to the image.")
 @ click.option('--cache/--no-cache', 'cache', default=True,
                help="Toggle use of docker build cache. Using cache may result in package errors.")
-@click.option('--endpoint', 'endpoint', default='unix://var/run/docker.sock',
+@click.option('--endpoint', 'endpoint', type=click.STRING, default='unix://var/run/docker.sock', show_default=True,
               help="Docker API endpoint URI.")
 @ click.pass_context
 def build(ctx, app_dir, latest, cache, endpoint):
     """Build the application.
+
     Prudoces a docker image for the application specified in APP_DIR.
     Assumes 'prepare' has been invoked successfully.
     """
