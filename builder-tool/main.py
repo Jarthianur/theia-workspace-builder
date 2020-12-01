@@ -346,15 +346,17 @@ def tagDockerImage(client, img, repo, latest, app_yml):
 @ click.option('--latest/--no-latest', 'latest', default=True,
                help="Additionally to the version tag, add a 'latest' tag to the image.")
 @ click.option('--cache/--no-cache', 'cache', default=True,
-               help="Toggle use of docker build cache. This may result in package errors.")
+               help="Toggle use of docker build cache. Using cache may result in package errors.")
+@click.option('--endpoint', 'endpoint', default='unix://var/run/docker.sock',
+              help="Docker API endpoint URI.")
 @ click.pass_context
-def build(ctx, app_dir, latest, cache):
+def build(ctx, app_dir, latest, cache, endpoint):
     """Build the application.
     Prudoces a docker image for the application specified in APP_DIR.
     Assumes 'prepare' has been invoked successfully.
     """
     initAppDir(ctx, app_dir)
-    client = docker.APIClient(base_url='unix://var/run/docker.sock')
+    client = docker.APIClient(base_url=endpoint)
     app_yml = ctx.obj['APP_YAML']
     repo = "%s/%s" % (app_yml['app']['org'],
                       app_yml['app']['name'])
