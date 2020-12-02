@@ -20,10 +20,10 @@ import click
 import yaml
 from pathlib import Path
 import json
-import jinja2
+import jinja2 as j2
 import sys
 import docker
-import logging
+import logging as log
 import validation
 
 
@@ -45,38 +45,65 @@ def fail(msg):
     Args:
         msg (str): An error message to print before exit.
     """
-    logging.error(msg)
+    log.error(msg)
     sys.exit(1)
 
 
-def resolvePackageJson(fpath, deps, plugs):
-    """Resolve dependencies and plugins from a 'package.json' file.
-
-    Read a 'package.json' file, and extract dependencies and plugins from it.
-    Dependencies will be stored in deps, plugins in plugs.
+def updateDictVerbose(dest, src):
+    """Update a dict with another dict, but warn on value change.
 
     Args:
-        fpath (Path): The unclusive path to the file.
-        deps (dict): The object where to store dependencies in.
-        plugs (dict): The object where to store plugins in.
+        dest (dict): The destination dict that gets updated.
+        src (dict): The source dict that is merged into dest.
 
     Raises:
-        PrepareError: If the file contains invalid json, or is not readable.
+        PrepareError: If an index does not exist.
     """
-    if not Path(fpath).is_file():
-        logging.warning("Could not find [%s]." % fpath)
-        return
     try:
-        with fpath.open('r') as pkg_json:
-            pkg = json.load(pkg_json)
-            if 'dependencies' in pkg:
-                deps.update(pkg['dependencies'])
-            if 'theiaPlugins' in pkg:
-                plugs.update(pkg['theiaPlugins'])
+        for s in src.items():
+            if s[0] in dest and dest[s[0]] != s[1]:
+                log.warning(
+                    "Key [%s] already exists and will be overwritten." % s[0])
+            dest[s[0]] = s[1]
+    except (KeyError, IndexError) as e:
+        raise PrepareError("Cause: %s" % (e))
+
+
+def loadJsonFile(file):
+    """Load a JSON file.
+
+    Args:
+        file (Path): The file to load.
+
+    Raises:
+        PrepareError: If the file can not be read, or contains invalid JSON.
+
+    Returns:
+        dict: The loaded JSON as structure.
+    """
+    try:
+        with file.open('r') as f:
+            return json.load(f)
     except json.JSONDecodeError as e:
-        raise PrepareError("Invalid JSON in [%s]! Cause: %s" % (fpath, e))
+        raise PrepareError("Invalid JSON in [%s]! Cause: %s" % (file, e))
     except OSError as e:
-        raise PrepareError("File at [%s] not readable! Cause: %s" % (fpath, e))
+        raise PrepareError("File at [%s] not readable! Cause: %s" % (file, e))
+
+
+def resolvePackageJson(file, pkg_all):
+    """Resolve dependencies and plugins from a JSON file.
+
+    Args:
+        file (Path): The JSON file.
+        pkg_all (dict): The object where to store stuff in.
+    """
+    if not Path(file).is_file():
+        log.warning("Could not find [%s]." % file)
+        return
+    pkg = loadJsonFile(file)
+    for key in ('dependencies', 'theiaPlugins'):
+        if key in pkg:
+            updateDictVerbose(pkg_all[key], pkg[key])
 
 
 def preparePackageJson(ctx):
@@ -89,32 +116,29 @@ def preparePackageJson(ctx):
         ctx (dict): The click context.
 
     Raises:
-        PrepareError: If the base template is invalid,
-                      something goes wrong while resolving files,
+        PrepareError: If something goes wrong while resolving files,
                       or the resulting 'package.json' file can not be written.
     """
-    pkg_tmpl = ctx.obj['TMPL_ENV'].get_template('package.json.j2')
-    deps = dict()
-    plugs = dict()
+    pkg = loadJsonFile(
+        Path(ctx.obj['MOD_DIR'], 'base', 'package.json').resolve())
     app_yml = ctx.obj['APP_YAML']
     app_dir = ctx.obj['APP_DIR']
 
+    pkg['name'] = '@theia/' + app_yml['app']['name']
+    pkg['version'] = app_yml['app']['version']
+    pkg['license'] = app_yml['app']['license']
+    pkg['theia']['frontend']['config']['applicationName'] = app_yml['app']['title']
     for mod in app_yml.get('modules') or ():
-        resolvePackageJson(Path(ctx.obj['MOD_DIR'], 'modules', mod, 'package.json').resolve(),
-                           deps, plugs)
-    resolvePackageJson(Path(app_dir, 'module', 'package.json').resolve(),
-                       deps, plugs)
+        resolvePackageJson(
+            Path(ctx.obj['MOD_DIR'], 'modules', mod, 'package.json').resolve(), pkg)
+    resolvePackageJson(Path(app_dir, 'module', 'package.json').resolve(), pkg)
 
-    fpath = Path(app_dir, 'package.json').resolve()
+    file = Path(app_dir, 'package.json').resolve()
     try:
-        with fpath.open('w') as res:
-            res.write(pkg_tmpl.render(app=app_yml['app'], package={
-                'dependencies': deps.items(), 'theiaPlugins': plugs.items()}))
-    except jinja2.TemplateError as e:
-        raise PrepareError(
-            "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
+        with file.open('w') as res:
+            json.dump(pkg, res, indent=2, sort_keys=True)
     except OSError as e:
-        raise PrepareError("File at [%s] not writable! Cause: %s" % (fpath, e))
+        raise PrepareError("File at [%s] not writable! Cause: %s" % (file, e))
 
 
 def resolveDockerfile(fpath, scripts, params):
@@ -132,13 +156,13 @@ def resolveDockerfile(fpath, scripts, params):
         PrepareError: If the template is invalid, or not readable.
     """
     if not (Path(fpath).is_dir() and Path(fpath, 'Dockerfile.j2').is_file()):
-        logging.warning("Could not find [%s]." % fpath)
+        log.warning("Could not find [%s]." % fpath)
         return
     try:
-        env = jinja2.Environment(loader=jinja2.FileSystemLoader(str(fpath)))
+        env = j2.Environment(loader=j2.FileSystemLoader(str(fpath)))
         dock = env.get_template('Dockerfile.j2')
         scripts.append(dock.render(parameters=params))
-    except jinja2.TemplateError as e:
+    except j2.TemplateError as e:
         raise PrepareError(
             "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
 
@@ -171,16 +195,16 @@ def prepareDockerfile(ctx):
     resolveDockerfile(Path(app_dir, 'module').resolve(),
                       scripts, params.get('module') or dict())
 
-    fpath = Path(app_dir, 'Dockerfile').resolve()
+    file = Path(app_dir, 'Dockerfile').resolve()
     try:
-        with fpath.open('w') as res:
+        with file.open('w') as res:
             res.write(dock_tmpl.render(scripts=scripts,
                                        base_tag=app_yml['app'].get('base_tag') or 'latest'))
-    except jinja2.TemplateError as e:
+    except j2.TemplateError as e:
         raise PrepareError(
-            "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
+            "Invalid template, or variables at [%s]! Cause: %s" % (file, e))
     except OSError as e:
-        raise PrepareError("File at [%s] not writable! Cause: %s" % (fpath, e))
+        raise PrepareError("File at [%s] not writable! Cause: %s" % (file, e))
 
 
 def initAppDir(ctx, app_dir):
@@ -197,12 +221,12 @@ def initAppDir(ctx, app_dir):
     if 'APP_DIR' in ctx.obj:
         return
     ctx.obj['APP_DIR'] = app_dir
-    fpath = Path(app_dir, 'application.yaml').resolve()
+    file = Path(app_dir, 'application.yaml').resolve()
     try:
-        with fpath.open('r') as app_yaml:
+        with file.open('r') as app_yaml:
             ctx.obj['APP_YAML'] = yaml.safe_load(app_yaml)
     except (yaml.YAMLError, OSError) as e:
-        fail("Failed to parse [%s]! Cause: %s" % (fpath, e))
+        fail("Failed to parse [%s]! Cause: %s" % (file, e))
     try:
         validation.validate(ctx.obj['APP_YAML'])
     except validation.ValidationError as e:
@@ -231,11 +255,12 @@ def cleanAppDir(app_dir):
 @ click.pass_context
 def cli(ctx):
     """Build custom Eclipse Theia workspaces (applications) from language / environment modules.
+
     An application is defined by an 'application.yaml' file inside the APP_DIR directory.
     """
     ctx.ensure_object(dict)
-    logging.basicConfig(
-        format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO)
+    log.basicConfig(
+        format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=log.INFO)
 
 
 @ cli.command()
@@ -256,16 +281,16 @@ def prepare(ctx, app_dir, mod_dir):
         ctx.obj['MOD_DIR'] = Path(ctx.obj['APP_DIR'], '..').resolve()
 
     try:
-        ctx.obj['TMPL_ENV'] = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(
-                [str(Path(ctx.obj['MOD_DIR'], 'base').resolve(strict=True)),
-                 str(Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(strict=True))]
+        ctx.obj['TMPL_ENV'] = j2.Environment(
+            loader=j2.FileSystemLoader(
+                str(Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(
+                    strict=True))
             ))
         preparePackageJson(ctx)
         prepareDockerfile(ctx)
-        logging.info("Successfully prepared '%s' at [%s]. You may now build the container.",
-                     ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
-    except (jinja2.TemplateError, OSError) as e:
+        log.info("Successfully prepared '%s' at [%s]. You may now build the container.",
+                 ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
+    except (j2.TemplateError, OSError) as e:
         cleanAppDir(app_dir)
         fail("Failed to read base template files! Cause: %s" % e)
     except PrepareError as e:
@@ -363,7 +388,7 @@ def build(ctx, app_dir, latest, cache, endpoint):
     repo = "%s/%s" % (app_yml['app']['org'],
                       app_yml['app']['name'])
 
-    logging.info("Building docker image for %s. This may take a while.", repo)
+    log.info("Building docker image for %s. This may take a while.", repo)
     img = None
     try:
         img = buildDockerImage(client, repo, app_dir, app_yml, cache)
@@ -371,14 +396,14 @@ def build(ctx, app_dir, latest, cache, endpoint):
         fail("Failed to connect to docker daemon!")
     except BuildError as e:
         fail("Failed to build the docker image! Cause: %s" % e)
-    logging.info("Successfully built the docker image.")
+    log.info("Successfully built the docker image.")
     try:
         tagDockerImage(client, img, repo, latest, app_yml)
     except OSError:
         fail("Failed to connect to docker daemon!")
     except BuildError as e:
         fail("Failed to tag the docker image! Cause: %s" % e)
-    logging.info("Successfully tagged the docker image.")
+    log.info("Successfully tagged the docker image.")
 
 
 if __name__ == '__main__':
