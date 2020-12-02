@@ -63,6 +63,20 @@ The prepare command must always be ran before build.
 python3 builder-tool/main.py prepare example-ws/
 ```
 
+If dependencies or plugins are defined multiple times in several package.json files, a warning will be emitted on value changes.
+The final value in the resulting package.json depends on module precedence.
+The precedences are as follows, where the last entry has the lowest precedence.
+
+- workspace-dir/module/package.json
+- modules/.../package.json
+- base/package.json
+
+The Dockerfile templates are appended as is, in following order.
+
+- base/_system_/Dockerfile.j2
+- modules/.../_system_/Dockerfile.j2
+- _workspace_/module/Dockerfile.j2
+
 #### Build
 
 Run the builder tool with **build** command, to build the docker image.
