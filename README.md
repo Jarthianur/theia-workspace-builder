@@ -131,3 +131,14 @@ Ideally a module contains also a readme file, to describe its purpose, and param
 | Base    | Use Case                           |
 | ------- | ---------------------------------- |
 | manjaro | Cutting edge development platform. |
+
+## Versioning
+
+In order to reflect the builder-tools version and the project version, the following schema is applied to git tags.
+
+```
+v<project version>@<builder-tool version>
+```
+
+Changes in the builder-tool are only reflected in its own version tag, while changes to modules or docs are reflected in the project version tag.
+Semantic versioning is used for both.
