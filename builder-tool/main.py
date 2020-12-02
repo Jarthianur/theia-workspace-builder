@@ -20,10 +20,10 @@ import click
 import yaml
 from pathlib import Path
 import json
-import jinja2
+import jinja2 as j2
 import sys
 import docker
-import logging
+import logging as log
 import validation
 
 
@@ -45,7 +45,7 @@ def fail(msg):
     Args:
         msg (str): An error message to print before exit.
     """
-    logging.error(msg)
+    log.error(msg)
     sys.exit(1)
 
 
@@ -62,7 +62,7 @@ def updateDictVerbose(dest, src):
     try:
         for s in src.items():
             if s[0] in dest and dest[s[0]] != s[1]:
-                logging.warning(
+                log.warning(
                     "Key [%s] already exists and will be overwritten." % s[0])
             dest[s[0]] = s[1]
     except (KeyError, IndexError) as e:
@@ -98,7 +98,7 @@ def resolvePackageJson(file, pkg_all):
         pkg_all (dict): The object where to store stuff in.
     """
     if not Path(file).is_file():
-        logging.warning("Could not find [%s]." % file)
+        log.warning("Could not find [%s]." % file)
         return
     pkg = loadJsonFile(file)
     for key in ('dependencies', 'theiaPlugins'):
@@ -156,13 +156,13 @@ def resolveDockerfile(fpath, scripts, params):
         PrepareError: If the template is invalid, or not readable.
     """
     if not (Path(fpath).is_dir() and Path(fpath, 'Dockerfile.j2').is_file()):
-        logging.warning("Could not find [%s]." % fpath)
+        log.warning("Could not find [%s]." % fpath)
         return
     try:
-        env = jinja2.Environment(loader=jinja2.FileSystemLoader(str(fpath)))
+        env = j2.Environment(loader=j2.FileSystemLoader(str(fpath)))
         dock = env.get_template('Dockerfile.j2')
         scripts.append(dock.render(parameters=params))
-    except jinja2.TemplateError as e:
+    except j2.TemplateError as e:
         raise PrepareError(
             "Invalid template, or variables at [%s]! Cause: %s" % (fpath, e))
 
@@ -200,7 +200,7 @@ def prepareDockerfile(ctx):
         with file.open('w') as res:
             res.write(dock_tmpl.render(scripts=scripts,
                                        base_tag=app_yml['app'].get('base_tag') or 'latest'))
-    except jinja2.TemplateError as e:
+    except j2.TemplateError as e:
         raise PrepareError(
             "Invalid template, or variables at [%s]! Cause: %s" % (file, e))
     except OSError as e:
@@ -259,8 +259,8 @@ def cli(ctx):
     An application is defined by an 'application.yaml' file inside the APP_DIR directory.
     """
     ctx.ensure_object(dict)
-    logging.basicConfig(
-        format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO)
+    log.basicConfig(
+        format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=log.INFO)
 
 
 @ cli.command()
@@ -281,16 +281,16 @@ def prepare(ctx, app_dir, mod_dir):
         ctx.obj['MOD_DIR'] = Path(ctx.obj['APP_DIR'], '..').resolve()
 
     try:
-        ctx.obj['TMPL_ENV'] = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(
+        ctx.obj['TMPL_ENV'] = j2.Environment(
+            loader=j2.FileSystemLoader(
                 str(Path(ctx.obj['MOD_DIR'], 'base', ctx.obj['APP_YAML']['app']['base']).resolve(
                     strict=True))
             ))
         preparePackageJson(ctx)
         prepareDockerfile(ctx)
-        logging.info("Successfully prepared '%s' at [%s]. You may now build the container.",
-                     ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
-    except (jinja2.TemplateError, OSError) as e:
+        log.info("Successfully prepared '%s' at [%s]. You may now build the container.",
+                 ctx.obj['APP_YAML']['app']['name'], ctx.obj['APP_DIR'])
+    except (j2.TemplateError, OSError) as e:
         cleanAppDir(app_dir)
         fail("Failed to read base template files! Cause: %s" % e)
     except PrepareError as e:
@@ -388,7 +388,7 @@ def build(ctx, app_dir, latest, cache, endpoint):
     repo = "%s/%s" % (app_yml['app']['org'],
                       app_yml['app']['name'])
 
-    logging.info("Building docker image for %s. This may take a while.", repo)
+    log.info("Building docker image for %s. This may take a while.", repo)
     img = None
     try:
         img = buildDockerImage(client, repo, app_dir, app_yml, cache)
@@ -396,14 +396,14 @@ def build(ctx, app_dir, latest, cache, endpoint):
         fail("Failed to connect to docker daemon!")
     except BuildError as e:
         fail("Failed to build the docker image! Cause: %s" % e)
-    logging.info("Successfully built the docker image.")
+    log.info("Successfully built the docker image.")
     try:
         tagDockerImage(client, img, repo, latest, app_yml)
     except OSError:
         fail("Failed to connect to docker daemon!")
     except BuildError as e:
         fail("Failed to tag the docker image! Cause: %s" % e)
-    logging.info("Successfully tagged the docker image.")
+    log.info("Successfully tagged the docker image.")
 
 
 if __name__ == '__main__':
