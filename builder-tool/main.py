@@ -124,7 +124,7 @@ def preparePackageJson(ctx):
     app_yml = ctx.obj['APP_YAML']
     app_dir = ctx.obj['APP_DIR']
 
-    pkg['name'] = '@theia/' + app_yml['app']['name']
+    pkg['name'] = "@theia/%s" % app_yml['app']['name']
     pkg['version'] = app_yml['app']['version']
     pkg['license'] = app_yml['app']['license']
     pkg['theia']['frontend']['config']['applicationName'] = app_yml['app']['title']
@@ -231,6 +231,9 @@ def initAppDir(ctx, app_dir):
         validation.validate(ctx.obj['APP_YAML'])
     except validation.ValidationError as e:
         fail(e)
+    if 'name' not in ctx.obj['APP_YAML']['app']:
+        ctx.obj['APP_YAML']['app']['name'] = str(
+            ctx.obj['APP_YAML']['app']['title']).lower().replace(' ', '-')
 
 
 def cleanAppDir(app_dir):
