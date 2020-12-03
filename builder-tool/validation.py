@@ -23,21 +23,25 @@ class ValidationError(Exception):
     pass
 
 
+def no_space(arg):
+    return ' ' not in arg
+
+
 APPLICATION_YAML = {
     'app': {
-        'name': And(str, len),
+        Optional('name'): And(str, len, no_space),
         'version': And(str, len),
-        'org': And(str, len),
+        'org': And(str, len, no_space),
         'license': And(str, len),
         'title': And(str, len),
         'base': And(str, len),
-        Optional('base_tag'): And(str, len)
+        Optional('base_tag'): And(str, len, no_space)
     },
     Optional('parameters'): Or({
         And(str, len): Or(dict, None)
     }, None),
     Optional('build'): Or({
-        Optional('registry'): Or(And(str, len), None),
+        Optional('registry'): Or(And(str, len, no_space), None),
         Optional('arguments'): Or(dict, None)
     }, None),
     Optional('modules'): Or([

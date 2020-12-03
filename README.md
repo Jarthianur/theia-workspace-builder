@@ -35,14 +35,13 @@ A minimal application.yaml looks like the following.
 
 ```yaml
 app:
-  name: example-ws
   version: "0.0.1"
   org: my-org
   license: "Apache-2.0"
   title: "Example Theia Workspace"
   base: manjaro
 modules:
-  - ...
+  - builtin
 ```
 
 To include a module in your workspace, just add it to the list of _modules_.
@@ -100,7 +99,7 @@ In the below schema, `//` is used as comment, and everything in `()` is optional
 
 ```
 app:
-  name: <docker image name>
+  (name): <docker image / theia app name>
   version: <version string>
   org: <organisation name>
   license: <license name>
@@ -117,6 +116,8 @@ app:
 (modules):
   <list of module names>
 ```
+
+If no app name is given, it will be generated from app title by replacing spaces with dashes (`-`) and convert characters to lower (`a-z`).
 
 ## How to create modules
 

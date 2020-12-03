@@ -1,5 +1,4 @@
 app:
-  name: theia-example-app
   version: "0.0.1"
   license: "Apache-2.0"
   title: "Example Theia Application"
