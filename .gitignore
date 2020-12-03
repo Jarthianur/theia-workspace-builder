@@ -1,3 +1,5 @@
 .vscode/
 .theia/
 *.pyc
+example-ws/Dockerfile
+example-ws/package.json
