@@ -1,7 +1,7 @@
-RUN pacman -S --needed --noconfirm \
+RUN apt update && apt install -y -qq \
       gdb \
-      go && \
-    pacman -Scc
+      golang-go && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN su - theia -c "go get -u -v github.com/mdempsky/gocode" && \
     su - theia -c "go get -u -v github.com/uudashr/gopkgs/cmd/gopkgs" && \

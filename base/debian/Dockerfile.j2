@@ -1,11 +1,13 @@
-FROM manjarolinux/base:{{ base_tag|default('latest') }}
+FROM debian:{{ base_tag|default('latest') }}
 
 ARG THEIA_UID=1337
 
-RUN pacman -Syyuu --noconfirm && \
-    pacman -S --needed --noconfirm \
-      yarn nvm tar grep awk wget git openssh make gcc python2 vim bash-completion binutils && \
-    pacman -Scc --noconfirm
+RUN apt update && \
+    apt dist-upgrade -y -qq && \
+    apt install -y -qq \
+      yarn tar grep mawk wget git openssh-client make gcc python2 vim bash-completion binutils build-essential libssl-dev && \
+    apt autoremove -y -qq && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN useradd -s /bin/bash -m -d /home/theia -U -u $THEIA_UID -c '' theia && \
     chmod g+rw /home && \
@@ -23,7 +25,10 @@ USER theia
 WORKDIR /home/theia
 ADD package.json ./package.json
 
-RUN source /usr/share/nvm/init-nvm.sh && \
+RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh -O /tmp/nvm-install.sh && \
+    bash /tmp/nvm-install.sh && \
+    rm -f /tmp/nvm-install.sh && \
+    source .bashrc && \
     nvm install 12 && \
     nvm use 12 && \
     mkdir bin && \
@@ -34,7 +39,7 @@ RUN source /usr/share/nvm/init-nvm.sh && \
 
 ENV PATH=/home/theia/bin:/home/theia/.local/bin:$PATH
 
-RUN source /usr/share/nvm/init-nvm.sh && \
+RUN source .bashrc && \
     yarn --pure-lockfile && \
     NODE_OPTIONS="--max_old_space_size=4096" yarn theia build && \
     yarn theia download:plugins && \
