@@ -129,9 +129,8 @@ Ideally a module contains also a readme file, to describe its purpose, and param
 
 ## Supported base systems
 
-| Base    | Use Case                           |
-| ------- | ---------------------------------- |
-| manjaro | Cutting edge development platform. |
+- manjaro
+- debian
 
 ## Versioning
 
