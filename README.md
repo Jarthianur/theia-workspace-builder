@@ -39,7 +39,7 @@ app:
   org: my-org
   license: "Apache-2.0"
   title: "Example Theia Workspace"
-  base: manjaro
+  base: archlinux
 modules:
   - builtin
 ```
@@ -129,9 +129,9 @@ Ideally a module contains also a readme file, to describe its purpose, and param
 
 ## Supported base systems
 
-| Base    | Use Case                           |
-| ------- | ---------------------------------- |
-| manjaro | Cutting edge development platform. |
+| Base      | Use Case                           |
+| --------- | ---------------------------------- |
+| archlinux | Cutting edge development platform. |
 
 ## Versioning
 
