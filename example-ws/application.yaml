@@ -3,7 +3,7 @@ app:
   license: "Apache-2.0"
   title: "Example Theia Application"
   org: my-org
-  base: manjaro
+  base: archlinux
   base_tag: latest
 parameters:
   module:
