@@ -1,6 +1,5 @@
 RUN pacman -S --needed --noconfirm \
-      rustup \
-      gdb && \
+      rustup && \
     pacman -Scc --noconfirm
 
 RUN su - theia -c "rustup default {{ parameters.rust_channel|default('stable') }}" && \

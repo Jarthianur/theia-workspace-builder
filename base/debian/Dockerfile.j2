@@ -40,8 +40,9 @@ RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh -O /
 
 ENV PATH=/home/theia/bin:/home/theia/.local/bin:$PATH
 
-RUN npm install --no-save yarn && \
-    YARN=/home/theia/node_modules/.bin/yarn && \
+RUN mkdir yarn && cd yarn && \
+    npm install --no-save --prefix ./ yarn && cd .. && \
+    YARN=/home/theia/yarn/node_modules/.bin/yarn && \
     $YARN --pure-lockfile && \
     NODE_OPTIONS="--max_old_space_size=4096" $YARN theia build && \
     $YARN theia download:plugins && \
@@ -52,8 +53,7 @@ RUN npm install --no-save yarn && \
     echo *.spec.* >> .yarnclean && \
     $YARN autoclean --force && \
     $YARN cache clean && \
-    rm -f .yarnclean && \
-    npm uninstall yarn
+    rm -rf .yarnclean yarn
 
 ENV THEIA_DEFAULT_PLUGINS=local-dir:/home/theia/plugins \
     SHELL=/bin/bash \

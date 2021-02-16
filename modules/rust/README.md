@@ -4,7 +4,6 @@ This module adds Rust support.
 
 ## Features
 
-- gdb
 - rustup
 - rust dev tools
 - cargo

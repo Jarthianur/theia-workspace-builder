@@ -1,5 +1,8 @@
+RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
+    echo "deb http://apt.llvm.org/{{ parameters.llvm_repo|default('buster') }}/ llvm-toolchain-{{ parameters.llvm_repo|default('buster') }} main" > /etc/apt/sources.list.d/llvm.list
+
 RUN apt update && apt install -y -qq \
-      clang clang-tools clang-format clang-tidy clazy
+      clang clangd clang-format clang-tidy clazy
       {%- if parameters.with_omp is sameas true %} \
       libgomp1 libomp-dev libomp5 libopenmpi-dev libopenmpi3
       {%- endif %} \
@@ -8,7 +11,8 @@ RUN apt update && apt install -y -qq \
       cmake \
       doxygen \
       gdb \
-      valgrind
+      valgrind \
+      cppcheck
       {%- if parameters.with_boost is sameas true %} \
       libboost-dev libboost-all-dev
       {%- endif %} && \
