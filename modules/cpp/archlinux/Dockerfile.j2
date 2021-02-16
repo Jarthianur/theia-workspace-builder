@@ -5,10 +5,10 @@ RUN pacman -S --needed --noconfirm \
       {%- endif %} \
       gcc \
       cmake \
-      make \
       doxygen \
       gdb \
-      valgrind
+      valgrind \
+      cppcheck
       {%- if parameters.with_boost is sameas true %} \
       boost boost-libs
       {%- endif %} && \
