@@ -46,4 +46,4 @@ ENV THEIA_DEFAULT_PLUGINS=local-dir:/home/theia/plugins \
 
 EXPOSE 3000
 
-ENTRYPOINT [ "node", "/home/theia/src-gen/backend/main.js", "/home/project", "--hostname=0.0.0.0" ]
+ENTRYPOINT [ "node", "/home/theia/src-gen/backend/main.js", "/home/project", "--hostname=0.0.0.0", "--vscode-api-version=1.52.0" ]
