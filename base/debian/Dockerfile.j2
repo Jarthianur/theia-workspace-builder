@@ -5,7 +5,7 @@ ARG THEIA_UID=1337
 RUN apt update && \
     apt dist-upgrade -y -qq && \
     apt install -y -qq \
-      yarn tar grep mawk wget git openssh-client make gcc python2 vim bash-completion binutils build-essential libssl-dev && \
+      tar grep mawk wget git openssh-client make gcc python2 vim bash-completion binutils build-essential libssl-dev && \
     apt autoremove -y -qq && \
     rm -rf /var/lib/apt/lists/*
 
@@ -28,7 +28,8 @@ ADD package.json ./package.json
 RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh -O /tmp/nvm-install.sh && \
     bash /tmp/nvm-install.sh && \
     rm -f /tmp/nvm-install.sh && \
-    source .bashrc && \
+    export NVM_DIR="/home/theia/.nvm" && \
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
     nvm install 12 && \
     nvm use 12 && \
     mkdir bin && \
@@ -39,18 +40,20 @@ RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh -O /
 
 ENV PATH=/home/theia/bin:/home/theia/.local/bin:$PATH
 
-RUN source .bashrc && \
-    yarn --pure-lockfile && \
-    NODE_OPTIONS="--max_old_space_size=4096" yarn theia build && \
-    yarn theia download:plugins && \
-    yarn --production && \
-    yarn autoclean --init && \
+RUN npm install --no-save yarn && \
+    YARN=/home/theia/node_modules/.bin/yarn && \
+    $YARN --pure-lockfile && \
+    NODE_OPTIONS="--max_old_space_size=4096" $YARN theia build && \
+    $YARN theia download:plugins && \
+    $YARN --production && \
+    $YARN autoclean --init && \
     echo *.ts >> .yarnclean && \
     echo *.ts.map >> .yarnclean && \
     echo *.spec.* >> .yarnclean && \
-    yarn autoclean --force && \
-    yarn cache clean && \
-    rm -f .yarnclean
+    $YARN autoclean --force && \
+    $YARN cache clean && \
+    rm -f .yarnclean && \
+    npm uninstall yarn
 
 ENV THEIA_DEFAULT_PLUGINS=local-dir:/home/theia/plugins \
     SHELL=/bin/bash \
