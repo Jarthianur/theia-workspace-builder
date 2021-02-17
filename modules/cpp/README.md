@@ -13,7 +13,7 @@ This module adds C++ support.
 - lcov
 - cppcheck
 - boost (optional)
-- openmp/openmpi (optional)
+- openmp (optional)
 
 ## Parameters
 

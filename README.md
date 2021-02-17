@@ -1,8 +1,24 @@
-# theia workspace builder
+# theia-workspace-builder
 
 Theia workspace builder (TWB) unifies the provisioning and building process of development environments featuring [eclipse-theia](https://github.com/eclipse-theia/theia), as docker containers.
 _TWB_ consists of different modular setups, alongside the actual builder tool.
 In short, _TWB_ allows to pack those modules together from a simple configuration file into a workspace of your needs.
+
+- [theia-workspace-builder](#theia-workspace-builder)
+  - [How it works](#how-it-works)
+  - [Getting started](#getting-started)
+    - [Define a Workspace](#define-a-workspace)
+    - [The application.yaml](#the-applicationyaml)
+    - [Prepare and build your Workspace](#prepare-and-build-your-workspace)
+      - [Preparation](#preparation)
+      - [Build](#build)
+    - [Run your Workspace Container](#run-your-workspace-container)
+  - [Complete application.yaml Schema](#complete-applicationyaml-schema)
+  - [How to create Modules](#how-to-create-modules)
+  - [Supported Base Systems](#supported-base-systems)
+  - [Versioning](#versioning)
+  - [Support Matrix](#support-matrix)
+    - [Legend](#legend)
 
 ## How it works
 
@@ -20,7 +36,7 @@ It bundles your workspace setup into a ready-to-use docker image.
 
 An example workspace setup can be found in [example-ws](example-ws/).
 
-### Define a workspace
+### Define a Workspace
 
 To define a workspace, all you need to do is to create a directory, and place an _application.yaml_ file in there.
 It is not important, where you create this directory, but recommended to place it inside your clone of this repository, as it allows the most easy use.
@@ -47,7 +63,7 @@ modules:
 To include a module in your workspace, just add it to the list of _modules_.
 It is also possible to set parameters for your workspace.
 
-### Prepare and build your workspace
+### Prepare and build your Workspace
 
 The tool that is used to provide workspace setups is found in [builder-tool](builder-tool/).
 It can either be invoked directly as python script, or installed via setuptools.
@@ -85,7 +101,7 @@ The build command might require _root_ permissions, in order to talk to the dock
 python3 builder-tool/main.py build example-ws/
 ```
 
-### Run your workspace container
+### Run your Workspace Container
 
 In order to run the workspace as container, with support for git over ssh, run something like the following command.
 
@@ -93,7 +109,7 @@ In order to run the workspace as container, with support for git over ssh, run s
 docker run --init --security-opt seccomp=unconfined -dit --restart=always -p 3000:3000 -v "$(pwd)/my-project/:/home/project:cached" -v "$(pwd)/.ssh:/home/theia/.ssh:ro" my-org/example-ws
 ```
 
-## Complete application.yaml schema
+## Complete application.yaml Schema
 
 In the below schema, `//` is used as comment, and everything in `()` is optional.
 
@@ -119,7 +135,7 @@ app:
 
 If no app name is given, it will be generated from app title by replacing spaces with dashes (`-`) and convert characters to lower (`a-z`).
 
-## How to create modules
+## How to create Modules
 
 Every module has its own directory under _modules_, where the directory name denotes the module name.
 A module may contain a _package.json_ file, with `dependencies` and `theiaPlugins`.
@@ -127,7 +143,7 @@ A module may contain subdirectories named after the base system, which may conta
 This Dockerfile template defines all installation steps for this module.
 Ideally a module contains also a readme file, to describe its purpose, and parameters.
 
-## Supported base systems
+## Supported Base Systems
 
 - archlinux
 - debian
@@ -142,3 +158,40 @@ v<project version>@<builder-tool version>
 
 Changes in the builder-tool are only reflected in its own version tag, while changes to modules or docs are reflected in the project version tag.
 Semantic versioning is used for both.
+
+## Support Matrix
+
+| Base System /<br>Module                            | archlinux |   debian |
+| -------------------------------------------------- | --------: | -------: |
+| [__builtin__](modules/builtin/README.md)           |  &#10003; | &#10003; |
+| [__coffeescript__](modules/coffeescript/README.md) |   &#8210; |  &#8210; |
+| [__csharp__](modules/csharp/README.md)             |   &#8210; |  &#8210; |
+| [__go__](modules/go/README.md)                     |  &#10003; |   &#126; |
+| [__hlsl__](modules/hlsl/README.md)                 |   &#8210; |  &#8210; |
+| [__java__](modules/java/README.md)                 |   &#8210; |  &#8210; |
+| [__lua__](modules/lua/README.md)                   |   &#8210; |  &#8210; |
+| [__php__](modules/php/README.md)                   |   &#8210; |  &#8210; |
+| [__python__](modules/python/README.md)             |  &#10003; |   &#126; |
+| [__razor__](modules/razor/README.md)               |   &#8210; |  &#8210; |
+| [__rust__](modules/rust/README.md)                 |  &#10003; |   &#126; |
+| [__swift__](modules/swift/README.md)               |   &#8210; |  &#8210; |
+| [__vb__](modules/vb/README.md)                     |   &#8210; |  &#8210; |
+| [__clojure__](modules/clojure/README.md)           |   &#8210; |  &#8210; |
+| [__cpp__](modules/cpp/README.md)                   |  &#10003; | &#10003; |
+| [__fsharp__](modules/fsharp/README.md)             |   &#8210; |  &#8210; |
+| [__groovy__](modules/groovy/README.md)             |   &#8210; |  &#8210; |
+| [__html-css__](modules/html-css/README.md)         |   &#8210; |  &#8210; |
+| [__js__](modules/js/README.md)                     |   &#8210; |  &#8210; |
+| [__objective-c__](modules/objective-c/README.md)   |   &#8210; |  &#8210; |
+| [__pkg-manager__](modules/pkg-manager/README.md)   |  &#10003; | &#10003; |
+| [__r__](modules/r/README.md)                       |   &#8210; |  &#8210; |
+| [__ruby__](modules/ruby/README.md)                 |   &#8210; |  &#8210; |
+| [__shaderlab__](modules/shaderlab/README.md)       |   &#8210; |  &#8210; |
+| [__themes__](modules/themes/README.md)             |  &#10003; | &#10003; |
+| [__web-utils__](modules/web-utils/README.md)       |   &#8210; |  &#8210; |
+
+### Legend
+
+&#10003;: Fully tested and actively maintained<br>
+&#126;: Roughly tested and sporadically maintained<br>
+&#8210;: Only builtin plugins

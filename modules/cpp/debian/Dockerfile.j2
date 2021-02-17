@@ -4,7 +4,7 @@ RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
 RUN apt update && apt install -y -qq \
       clang clangd clang-format clang-tidy clazy
       {%- if parameters.with_omp is sameas true %} \
-      libgomp1 libomp-dev libomp5 libopenmpi-dev libopenmpi3
+      libgomp1 libomp-dev libomp5
       {%- endif %} \
       gcc \
       g++ \
@@ -15,7 +15,10 @@ RUN apt update && apt install -y -qq \
       cppcheck
       {%- if parameters.with_boost is sameas true %} \
       libboost-dev libboost-all-dev
-      {%- endif %} && \
+      {%- endif %}
+    {%- if parameters.with_omp is sameas true %} && \
+    apt install -y -qq libomp-13-dev
+    {%- endif %} && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget -q https://github.com/linux-test-project/lcov/releases/download/v1.15/lcov-1.15.tar.gz && \
