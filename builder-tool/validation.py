@@ -35,7 +35,8 @@ APPLICATION_YAML = {
         'license': And(str, len),
         'title': And(str, len),
         'base': And(str, len),
-        Optional('base_tag'): And(str, len, no_space)
+        Optional('base_tag'): And(str, len, no_space),
+        Optional('dep_version'): And(str, len)
     },
     Optional('parameters'): Or({
         And(str, len): Or(dict, None)

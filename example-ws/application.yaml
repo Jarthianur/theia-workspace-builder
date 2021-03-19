@@ -5,6 +5,7 @@ app:
   org: my-org
   base: archlinux
   base_tag: latest
+  dep_version: next
 parameters:
   module:
     echo: "hello world"

@@ -132,6 +132,11 @@ def preparePackageJson(ctx):
         resolvePackageJson(
             Path(ctx.obj['MOD_DIR'], 'modules', mod, 'package.json').resolve(), pkg)
     resolvePackageJson(Path(app_dir, 'module', 'package.json').resolve(), pkg)
+    if 'dep_version' in app_yml['app']:
+        for dep in pkg['dependencies']:
+            pkg['dependencies'][dep] = app_yml['app']['dep_version']
+        for dep in pkg['devDependencies']:
+            pkg['devDependencies'][dep] = app_yml['app']['dep_version']
 
     file = Path(app_dir, 'package.json').resolve()
     try:
