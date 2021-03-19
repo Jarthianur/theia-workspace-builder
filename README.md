@@ -122,6 +122,7 @@ app:
   title: <application title>
   base: <base system name>
   (base_tag): <base system tag, default is 'latest'>
+  (dep_version): <theia dependencies version, default 'latest'>
 (parameters): // map module names to their params
   (<module name>):
     <key-value entries for params used in template>
