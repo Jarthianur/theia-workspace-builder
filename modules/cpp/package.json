@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@theia/cpp-debug": "next"
+    "@theia/cpp-debug": "latest"
   },
   "theiaPlugins": {
     "vscode-builtin-cpp": "https://open-vsx.org/api/vscode/cpp/1.51.1/file/vscode.cpp-1.51.1.vsix",
