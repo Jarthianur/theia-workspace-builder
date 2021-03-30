@@ -1,0 +1,5 @@
+{
+    "dependencies": {
+        "@theia/vsx-registry": "latest"
+    }
+}
