@@ -1,14 +1,14 @@
 {
   "dependencies": {},
   "theiaPlugins": {
-    "vscode-builtin-theme-abyss": "https://open-vsx.org/api/vscode/theme-abyss/1.51.1/file/vscode.theme-abyss-1.51.1.vsix",
-    "vscode-builtin-theme-kimbie-dark": "https://open-vsx.org/api/vscode/theme-kimbie-dark/1.51.1/file/vscode.theme-kimbie-dark-1.51.1.vsix",
-    "vscode-builtin-theme-monokai": "https://open-vsx.org/api/vscode/theme-monokai/1.51.1/file/vscode.theme-monokai-1.51.1.vsix",
-    "vscode-builtin-theme-monokai-dimmed": "https://open-vsx.org/api/vscode/theme-monokai-dimmed/1.51.1/file/vscode.theme-monokai-dimmed-1.51.1.vsix",
-    "vscode-builtin-theme-quietlight": "https://open-vsx.org/api/vscode/theme-quietlight/1.51.1/file/vscode.theme-quietlight-1.51.1.vsix",
-    "vscode-builtin-theme-red": "https://open-vsx.org/api/vscode/theme-red/1.51.1/file/vscode.theme-red-1.51.1.vsix",
-    "vscode-builtin-theme-solarized-dark": "https://open-vsx.org/api/vscode/theme-solarized-dark/1.51.1/file/vscode.theme-solarized-dark-1.51.1.vsix",
-    "vscode-builtin-theme-solarized-light": "https://open-vsx.org/api/vscode/theme-solarized-light/1.51.1/file/vscode.theme-solarized-light-1.51.1.vsix",
-    "vscode-builtin-theme-tomorrow-night-blue": "https://open-vsx.org/api/vscode/theme-tomorrow-night-blue/1.51.1/file/vscode.theme-tomorrow-night-blue-1.51.1.vsix"
+    "vscode-builtin-theme-abyss": "https://open-vsx.org/api/vscode/theme-abyss/1.49.3/file/vscode.theme-abyss-1.49.3.vsix",
+    "vscode-builtin-theme-kimbie-dark": "https://open-vsx.org/api/vscode/theme-kimbie-dark/1.49.3/file/vscode.theme-kimbie-dark-1.49.3.vsix",
+    "vscode-builtin-theme-monokai": "https://open-vsx.org/api/vscode/theme-monokai/1.49.3/file/vscode.theme-monokai-1.49.3.vsix",
+    "vscode-builtin-theme-monokai-dimmed": "https://open-vsx.org/api/vscode/theme-monokai-dimmed/1.49.3/file/vscode.theme-monokai-dimmed-1.49.3.vsix",
+    "vscode-builtin-theme-quietlight": "https://open-vsx.org/api/vscode/theme-quietlight/1.49.3/file/vscode.theme-quietlight-1.49.3.vsix",
+    "vscode-builtin-theme-red": "https://open-vsx.org/api/vscode/theme-red/1.49.3/file/vscode.theme-red-1.49.3.vsix",
+    "vscode-builtin-theme-solarized-dark": "https://open-vsx.org/api/vscode/theme-solarized-dark/1.49.3/file/vscode.theme-solarized-dark-1.49.3.vsix",
+    "vscode-builtin-theme-solarized-light": "https://open-vsx.org/api/vscode/theme-solarized-light/1.49.3/file/vscode.theme-solarized-light-1.49.3.vsix",
+    "vscode-builtin-theme-tomorrow-night-blue": "https://open-vsx.org/api/vscode/theme-tomorrow-night-blue/1.49.3/file/vscode.theme-tomorrow-night-blue-1.49.3.vsix"
   }
 }

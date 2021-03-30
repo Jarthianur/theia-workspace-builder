@@ -1,6 +1,6 @@
 {
   "dependencies": {},
   "theiaPlugins": {
-    "vscode-builtin-fsharp": "https://open-vsx.org/api/vscode/fsharp/1.51.1/file/vscode.fsharp-1.51.1.vsix"
+    "vscode-builtin-fsharp": "https://open-vsx.org/api/vscode/fsharp/1.49.3/file/vscode.fsharp-1.49.3.vsix"
   }
 }

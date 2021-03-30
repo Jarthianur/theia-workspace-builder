@@ -1,7 +1,7 @@
 {
   "dependencies": {},
   "theiaPlugins": {
-    "vscode-builtin-php": "https://open-vsx.org/api/vscode/php/1.51.1/file/vscode.php-1.51.1.vsix",
-    "vscode-builtin-php-language-features": "https://open-vsx.org/api/vscode/php-language-features/1.51.1/file/vscode.php-language-features-1.51.1.vsix"
+    "vscode-builtin-php": "https://open-vsx.org/api/vscode/php/1.49.3/file/vscode.php-1.49.3.vsix",
+    "vscode-builtin-php-language-features": "https://open-vsx.org/api/vscode/php-language-features/1.49.3/file/vscode.php-language-features-1.49.3.vsix"
   }
 }

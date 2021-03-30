@@ -1,6 +1,6 @@
 {
   "dependencies": {},
   "theiaPlugins": {
-    "vscode-builtin-r": "https://open-vsx.org/api/vscode/r/1.51.1/file/vscode.r-1.51.1.vsix"
+    "vscode-builtin-r": "https://open-vsx.org/api/vscode/r/1.49.3/file/vscode.r-1.49.3.vsix"
   }
 }

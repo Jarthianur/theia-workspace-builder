@@ -1,7 +1,7 @@
 {
   "dependencies": {},
   "theiaPlugins": {
-    "vscode-builtin-go": "https://open-vsx.org/api/vscode/go/1.51.1/file/vscode.go-1.51.1.vsix",
+    "vscode-builtin-go": "https://open-vsx.org/api/vscode/go/1.49.3/file/vscode.go-1.49.3.vsix",
     "vscode-go": "https://open-vsx.org/api/golang/Go/0.22.0/file/golang.Go-0.22.0.vsix"
   }
 }
