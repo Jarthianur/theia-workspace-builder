@@ -162,34 +162,34 @@ Semantic versioning is used for both.
 
 ## Support Matrix
 
-| Base System /<br>Module                            | archlinux |   debian |
-| -------------------------------------------------- | --------: | -------: |
-| [__builtin__](modules/builtin/README.md)           |  &#10003; | &#10003; |
-| [__coffeescript__](modules/coffeescript/README.md) |   &#8210; |  &#8210; |
-| [__csharp__](modules/csharp/README.md)             |   &#8210; |  &#8210; |
-| [__go__](modules/go/README.md)                     |  &#10003; |   &#126; |
-| [__hlsl__](modules/hlsl/README.md)                 |   &#8210; |  &#8210; |
-| [__java__](modules/java/README.md)                 |   &#8210; |  &#8210; |
-| [__lua__](modules/lua/README.md)                   |   &#8210; |  &#8210; |
-| [__php__](modules/php/README.md)                   |   &#8210; |  &#8210; |
-| [__python__](modules/python/README.md)             |  &#10003; |   &#126; |
-| [__razor__](modules/razor/README.md)               |   &#8210; |  &#8210; |
-| [__rust__](modules/rust/README.md)                 |  &#10003; |   &#126; |
-| [__swift__](modules/swift/README.md)               |   &#8210; |  &#8210; |
-| [__vb__](modules/vb/README.md)                     |   &#8210; |  &#8210; |
-| [__clojure__](modules/clojure/README.md)           |   &#8210; |  &#8210; |
-| [__cpp__](modules/cpp/README.md)                   |  &#10003; | &#10003; |
-| [__fsharp__](modules/fsharp/README.md)             |   &#8210; |  &#8210; |
-| [__groovy__](modules/groovy/README.md)             |   &#8210; |  &#8210; |
-| [__html-css__](modules/html-css/README.md)         |   &#8210; |  &#8210; |
-| [__js__](modules/js/README.md)                     |   &#8210; |  &#8210; |
-| [__objective-c__](modules/objective-c/README.md)   |   &#8210; |  &#8210; |
-| [__pkg-manager__](modules/pkg-manager/README.md)   |  &#10003; | &#10003; |
-| [__r__](modules/r/README.md)                       |   &#8210; |  &#8210; |
-| [__ruby__](modules/ruby/README.md)                 |   &#8210; |  &#8210; |
-| [__shaderlab__](modules/shaderlab/README.md)       |   &#8210; |  &#8210; |
-| [__themes__](modules/themes/README.md)             |  &#10003; | &#10003; |
-| [__web-utils__](modules/web-utils/README.md)       |   &#8210; |  &#8210; |
+| Base System /<br>Module                            | archlinux |   debian |  ubuntu |
+| -------------------------------------------------- | --------: | -------: | ------: |
+| [**builtin**](modules/builtin/README.md)           |  &#10003; | &#10003; | &#8210; |
+| [**coffeescript**](modules/coffeescript/README.md) |   &#8210; |  &#8210; | &#8210; |
+| [**csharp**](modules/csharp/README.md)             |   &#8210; |  &#8210; | &#8210; |
+| [**go**](modules/go/README.md)                     |  &#10003; |   &#126; | &#8210; |
+| [**hlsl**](modules/hlsl/README.md)                 |   &#8210; |  &#8210; | &#8210; |
+| [**java**](modules/java/README.md)                 |   &#8210; |  &#8210; | &#8210; |
+| [**lua**](modules/lua/README.md)                   |   &#8210; |  &#8210; | &#8210; |
+| [**php**](modules/php/README.md)                   |   &#8210; |  &#8210; | &#8210; |
+| [**python**](modules/python/README.md)             |  &#10003; |   &#126; | &#8210; |
+| [**razor**](modules/razor/README.md)               |   &#8210; |  &#8210; | &#8210; |
+| [**rust**](modules/rust/README.md)                 |  &#10003; |   &#126; | &#8210; |
+| [**swift**](modules/swift/README.md)               |   &#8210; |  &#8210; | &#8210; |
+| [**vb**](modules/vb/README.md)                     |   &#8210; |  &#8210; | &#8210; |
+| [**clojure**](modules/clojure/README.md)           |   &#8210; |  &#8210; | &#8210; |
+| [**cpp**](modules/cpp/README.md)                   |  &#10003; | &#10003; | &#8210; |
+| [**fsharp**](modules/fsharp/README.md)             |   &#8210; |  &#8210; | &#8210; |
+| [**groovy**](modules/groovy/README.md)             |   &#8210; |  &#8210; | &#8210; |
+| [**html-css**](modules/html-css/README.md)         |   &#8210; |  &#8210; | &#8210; |
+| [**js**](modules/js/README.md)                     |   &#8210; |  &#8210; | &#8210; |
+| [**objective-c**](modules/objective-c/README.md)   |   &#8210; |  &#8210; | &#8210; |
+| [**pkg-manager**](modules/pkg-manager/README.md)   |  &#10003; | &#10003; | &#8210; |
+| [**r**](modules/r/README.md)                       |   &#8210; |  &#8210; | &#8210; |
+| [**ruby**](modules/ruby/README.md)                 |   &#8210; |  &#8210; | &#8210; |
+| [**shaderlab**](modules/shaderlab/README.md)       |   &#8210; |  &#8210; | &#8210; |
+| [**themes**](modules/themes/README.md)             |  &#10003; | &#10003; | &#8210; |
+| [**web-utils**](modules/web-utils/README.md)       |   &#8210; |  &#8210; | &#8210; |
 
 ### Legend
 

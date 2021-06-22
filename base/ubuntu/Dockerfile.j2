@@ -1,0 +1,65 @@
+FROM ubuntu:{{ base_tag|default('latest') }}
+
+ARG THEIA_UID=1337
+
+RUN apt update && \
+    apt dist-upgrade -y -qq && \
+    apt install -y -qq \
+      tar grep mawk wget git openssh-client make gcc python2 vim bash-completion binutils build-essential libssl-dev && \
+    apt autoremove -y -qq && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN useradd -s /bin/bash -m -d /home/theia -U -u $THEIA_UID -c '' theia && \
+    chmod g+rw /home && \
+    mkdir -p /home/project && \
+    chown -R theia:theia /home/theia && \
+    chown -R theia:theia /home/project
+
+{% for s in scripts %}
+{{ s }}
+{% endfor %}
+
+RUN chown -R theia:theia /home/theia
+
+USER theia
+WORKDIR /home/theia
+ADD package.json ./package.json
+
+RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh -O /tmp/nvm-install.sh && \
+    bash /tmp/nvm-install.sh && \
+    rm -f /tmp/nvm-install.sh && \
+    export NVM_DIR="/home/theia/.nvm" && \
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
+    nvm install 12 && \
+    nvm use 12 && \
+    mkdir bin && \
+    ln -s "$(echo -n $PATH | tr ':' '\n' | grep nvm)/node" /home/theia/bin/node && \
+    ln -s "$(echo -n $PATH | tr ':' '\n' | grep nvm)/npm" /home/theia/bin/npm && \
+    npm config set python /usr/bin/python2 --global && \
+    npm config set python /usr/bin/python2
+
+ENV PATH=/home/theia/bin:/home/theia/.local/bin:$PATH
+
+RUN mkdir yarn && cd yarn && \
+    npm install --no-save --prefix ./ yarn && cd .. && \
+    YARN=/home/theia/yarn/node_modules/.bin/yarn && \
+    $YARN --pure-lockfile && \
+    NODE_OPTIONS="--max_old_space_size=4096" $YARN theia build && \
+    $YARN theia download:plugins && \
+    $YARN --production && \
+    $YARN autoclean --init && \
+    echo *.ts >> .yarnclean && \
+    echo *.ts.map >> .yarnclean && \
+    echo *.spec.* >> .yarnclean && \
+    $YARN autoclean --force && \
+    $YARN cache clean && \
+    rm -rf .yarnclean yarn
+
+ENV THEIA_DEFAULT_PLUGINS=local-dir:/home/theia/plugins \
+    SHELL=/bin/bash \
+    VISUAL=vim \
+    EDITOR=vim
+
+EXPOSE 3000
+
+ENTRYPOINT [ "node", "/home/theia/src-gen/backend/main.js", "/home/project", "--hostname=0.0.0.0" ]

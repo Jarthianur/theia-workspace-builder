@@ -1,0 +1,10 @@
+RUN apt update && apt install -y -qq \
+      rustc \
+      cargo && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN su - theia -c "rustup default {{ parameters.rust_channel|default('stable') }}" && \
+    su - theia -c "rustup component add rust-src rust-docs rls rust-analysis rustfmt clippy" 
+    {%- if parameters.with_racer is sameas true %} && \
+    su - theia -c "cargo +{{ parameters.rust_channel|default('stable') }} install racer"
+    {%- endif %}
