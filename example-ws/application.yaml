@@ -3,9 +3,9 @@ app:
   license: "Apache-2.0"
   title: "Example Theia Application"
   org: my-org
-  base: archlinux
-  base_tag: latest
-  dep_version: next
+  base: ubuntu
+  base_tag: focal
+  dep_version: latest
 parameters:
   module:
     echo: "hello world"
@@ -15,3 +15,4 @@ modules:
   - pkg-manager
   - rust
   - cpp
+  - python

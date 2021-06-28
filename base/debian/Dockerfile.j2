@@ -5,7 +5,7 @@ ARG THEIA_UID=1337
 RUN apt update && \
     apt dist-upgrade -y -qq && \
     apt install -y -qq \
-      tar grep mawk wget git openssh-client make gcc python2 vim bash-completion binutils build-essential libssl-dev && \
+      tar grep mawk wget git openssh-client make gcc python2 vim bash-completion binutils build-essential libssl-dev libsecret-1-0 && \
     apt autoremove -y -qq && \
     rm -rf /var/lib/apt/lists/*
 
