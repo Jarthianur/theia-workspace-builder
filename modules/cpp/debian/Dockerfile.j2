@@ -1,5 +1,5 @@
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-    echo "deb http://apt.llvm.org/{{ parameters.llvm_repo|default('buster') }}/ llvm-toolchain-{{ parameters.llvm_repo|default('buster') }} main" > /etc/apt/sources.list.d/llvm.list
+    echo "deb http://apt.llvm.org/{{ parameters.llvm_repo|default('bullseye') }}/ llvm-toolchain-{{ parameters.llvm_repo|default('bullseye') }} main" > /etc/apt/sources.list.d/llvm.list
 
 RUN apt update && apt install -y -qq \
       clang clangd clang-format clang-tidy clazy
@@ -17,7 +17,7 @@ RUN apt update && apt install -y -qq \
       libboost-dev libboost-all-dev
       {%- endif %}
     {%- if parameters.with_omp is sameas true %} && \
-    apt install -y -qq libomp-13-dev
+    apt install -y -qq libomp-14-dev
     {%- endif %} && \
     rm -rf /var/lib/apt/lists/*
 

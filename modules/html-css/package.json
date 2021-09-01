@@ -1,9 +1,9 @@
 {
   "dependencies": {},
   "theiaPlugins": {
-    "vscode-builtin-css": "https://open-vsx.org/api/vscode/css/1.49.3/file/vscode.css-1.49.3.vsix",
-    "vscode-builtin-css-language-features": "https://open-vsx.org/api/vscode/css-language-features/1.49.3/file/vscode.css-language-features-1.49.3.vsix",
-    "vscode-builtin-html": "https://open-vsx.org/api/vscode/html/1.49.3/file/vscode.html-1.49.3.vsix",
-    "vscode-builtin-html-language-features": "https://open-vsx.org/api/vscode/html-language-features/1.49.3/file/vscode.html-language-features-1.49.3.vsix"
+    "vscode-builtin-css": "https://open-vsx.org/api/vscode/css/1.55.2/file/vscode.css-1.55.2.vsix",
+    "vscode-builtin-css-language-features": "https://open-vsx.org/api/vscode/css-language-features/1.55.2/file/vscode.css-language-features-1.55.2.vsix",
+    "vscode-builtin-html": "https://open-vsx.org/api/vscode/html/1.55.2/file/vscode.html-1.55.2.vsix",
+    "vscode-builtin-html-language-features": "https://open-vsx.org/api/vscode/html-language-features/1.55.2/file/vscode.html-language-features-1.55.2.vsix"
   }
 }
