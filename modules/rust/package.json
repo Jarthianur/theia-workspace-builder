@@ -1,7 +1,5 @@
 {
-  "dependencies": {
-    "@theia/cpp-debug": "latest"
-  },
+  "dependencies": {},
   "theiaPlugins": {
     "vscode-builtin-rust": "https://open-vsx.org/api/vscode/rust/1.55.2/file/vscode.rust-1.55.2.vsix",
     "rust-lang": "https://open-vsx.org/api/rust-lang/rust/0.7.8/file/rust-lang.rust-0.7.8.vsix"

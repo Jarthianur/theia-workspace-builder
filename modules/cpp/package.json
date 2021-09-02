@@ -1,7 +1,5 @@
 {
-  "dependencies": {
-    "@theia/cpp-debug": "latest"
-  },
+  "dependencies": {},
   "theiaPlugins": {
     "vscode-builtin-cpp": "https://open-vsx.org/api/vscode/cpp/1.55.2/file/vscode.cpp-1.55.2.vsix",
     "vscode-clangd": "https://open-vsx.org/api/llvm-vs-code-extensions/vscode-clangd/0.1.11/file/llvm-vs-code-extensions.vscode-clangd-0.1.11.vsix",

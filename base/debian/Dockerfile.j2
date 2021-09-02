@@ -25,7 +25,7 @@ USER theia
 WORKDIR /home/theia
 ADD package.json ./package.json
 
-RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh -O /tmp/nvm-install.sh && \
+RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh -O /tmp/nvm-install.sh && \
     bash /tmp/nvm-install.sh && \
     rm -f /tmp/nvm-install.sh && \
     export NVM_DIR="/home/theia/.nvm" && \

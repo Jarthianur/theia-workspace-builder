@@ -190,6 +190,7 @@ Semantic versioning is used for both.
 | [__shaderlab__](modules/shaderlab/README.md)       |   &#8210; |  &#8210; |
 | [__themes__](modules/themes/README.md)             |  &#10003; | &#10003; |
 | [__web-utils__](modules/web-utils/README.md)       |   &#8210; |  &#8210; |
+| [__plantuml__](modules/plantuml/README.md)         |   &#8210; |  &#8210; |
 
 ### Legend
 

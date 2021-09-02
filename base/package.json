@@ -14,6 +14,7 @@
     }
   },
   "dependencies": {
+    "@theia/bulk-edit": "latest",
     "@theia/callhierarchy": "latest",
     "@theia/console": "latest",
     "@theia/core": "latest",
@@ -33,17 +34,21 @@
     "@theia/navigator": "latest",
     "@theia/outline-view": "latest",
     "@theia/output": "latest",
-    "@theia/plantuml": "latest",
     "@theia/plugin": "latest",
+    "@theia/plugin-dev": "latest",
     "@theia/plugin-ext": "latest",
     "@theia/plugin-ext-vscode": "latest",
+    "@theia/plugin-metrics": "latest",
     "@theia/preferences": "latest",
     "@theia/preview": "latest",
     "@theia/process": "latest",
+    "@theia/property-view": "latest",
     "@theia/scm": "latest",
+    "@theia/scm-extra": "latest",
     "@theia/search-in-workspace": "latest",
     "@theia/task": "latest",
     "@theia/terminal": "latest",
+    "@theia/timeline": "latest",
     "@theia/typehierarchy": "latest",
     "@theia/userstorage": "latest",
     "@theia/variable-resolver": "latest",
@@ -81,8 +86,8 @@
     "vscode-builtin-yaml": "https://open-vsx.org/api/vscode/yaml/1.55.2/file/vscode.yaml-1.55.2.vsix",
     "vscode-editorconfig": "https://open-vsx.org/api/EditorConfig/EditorConfig/0.16.6/file/EditorConfig.EditorConfig-0.16.6.vsix",
     "vscode-references-view": "https://open-vsx.org/api/ms-vscode/references-view/0.0.80/file/ms-vscode.references-view-0.0.80.vsix",
+    "vscode-eslint": "https://open-vsx.org/api/dbaeumer/vscode-eslint/2.1.8/file/dbaeumer.vscode-eslint-2.1.8.vsix",
     "marky-markdown": "https://open-vsx.org/api/robole/marky-markdown/2.9.0/file/robole.marky-markdown-2.9.0.vsix",
-    "plantuml": "https://open-vsx.org/api/jebbs/plantuml/2.14.0/file/jebbs.plantuml-2.14.0.vsix",
     "prettier": "https://open-vsx.org/api/esbenp/prettier-vscode/6.4.0/file/esbenp.prettier-vscode-6.4.0.vsix"
   }
 }
