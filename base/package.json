@@ -74,7 +74,6 @@
     "vscode-builtin-log": "https://open-vsx.org/api/vscode/log/1.55.2/file/vscode.log-1.55.2.vsix",
     "vscode-builtin-make": "https://open-vsx.org/api/vscode/make/1.55.2/file/vscode.make-1.55.2.vsix",
     "vscode-builtin-markdown": "https://open-vsx.org/api/vscode/markdown/1.55.2/file/vscode.markdown-1.55.2.vsix",
-    "vscode-builtin-markdown-language-features": "https://open-vsx.org/api/vscode/markdown-language-features/1.39.2/file/vscode.markdown-language-features-1.39.2.vsix",
     "vscode-builtin-merge-conflict": "https://open-vsx.org/api/vscode/merge-conflict/1.55.2/file/vscode.merge-conflict-1.55.2.vsix",
     "vscode-builtin-perl": "https://open-vsx.org/api/vscode/perl/1.55.2/file/vscode.perl-1.55.2.vsix",
     "vscode-builtin-powershell": "https://open-vsx.org/api/vscode/powershell/1.55.2/file/vscode.powershell-1.55.2.vsix",
