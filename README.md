@@ -167,7 +167,7 @@ Semantic versioning is used for both.
 | [__builtin__](modules/builtin/README.md)           |  &#10003; | &#10003; |
 | [__coffeescript__](modules/coffeescript/README.md) |   &#8210; |  &#8210; |
 | [__csharp__](modules/csharp/README.md)             |   &#8210; |  &#8210; |
-| [__go__](modules/go/README.md)                     |  &#10003; |   &#126; |
+| [__go__](modules/go/README.md)                     |    &#126; |   &#126; |
 | [__hlsl__](modules/hlsl/README.md)                 |   &#8210; |  &#8210; |
 | [__java__](modules/java/README.md)                 |   &#8210; |  &#8210; |
 | [__lua__](modules/lua/README.md)                   |   &#8210; |  &#8210; |
