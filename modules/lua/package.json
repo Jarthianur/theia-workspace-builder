@@ -1,6 +1,6 @@
 {
   "dependencies": {},
   "theiaPlugins": {
-    "vscode-builtin-lua": "https://open-vsx.org/api/vscode/lua/1.49.3/file/vscode.lua-1.49.3.vsix"
+    "vscode-builtin-lua": "https://open-vsx.org/api/vscode/lua/1.55.2/file/vscode.lua-1.55.2.vsix"
   }
 }
