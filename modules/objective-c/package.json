@@ -1,6 +1,0 @@
-{
-  "dependencies": {},
-  "theiaPlugins": {
-    "vscode-builtin-objective-c": "https://open-vsx.org/api/vscode/objective-c/1.55.2/file/vscode.objective-c-1.55.2.vsix"
-  }
-}

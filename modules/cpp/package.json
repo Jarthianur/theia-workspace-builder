@@ -2,7 +2,6 @@
   "dependencies": {},
   "theiaPlugins": {
     "cdt-gdb-vscode": "https://open-vsx.org/api/eclipse-cdt/cdt-gdb-vscode/0.0.92/file/eclipse-cdt.cdt-gdb-vscode-0.0.92.vsix",
-    "vscode-builtin-cpp": "https://open-vsx.org/api/vscode/cpp/1.55.2/file/vscode.cpp-1.55.2.vsix",
     "vscode-clangd": "https://open-vsx.org/api/llvm-vs-code-extensions/vscode-clangd/0.1.11/file/llvm-vs-code-extensions.vscode-clangd-0.1.11.vsix",
     "doxygen-generator": "https://open-vsx.org/api/cschlosser/doxdocgen/1.3.2/file/cschlosser.doxdocgen-1.3.2.vsix"
   }
