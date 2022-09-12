@@ -30,8 +30,8 @@ RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh -O /
     rm -f /tmp/nvm-install.sh && \
     export NVM_DIR="/home/theia/.nvm" && \
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
-    nvm install 12 && \
-    nvm use 12 && \
+    nvm install 14 && \
+    nvm use 14 && \
     mkdir bin && \
     ln -s "$(echo -n $PATH | tr ':' '\n' | grep nvm)/node" /home/theia/bin/node && \
     ln -s "$(echo -n $PATH | tr ':' '\n' | grep nvm)/npm" /home/theia/bin/npm && \

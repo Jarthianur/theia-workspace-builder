@@ -75,6 +75,9 @@
     "vscode.git-ui",
     "vscode.github",
     "vscode.github-authentication",
-    "vscode.microsoft-authentication"
+    "vscode.microsoft-authentication",
+    "ms-vscode.js-debug-companion",
+    "ms-python.vscode-pylance",
+    "ms-toolsai.jupyter"
   ]
 }
