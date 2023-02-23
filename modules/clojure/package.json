@@ -1,6 +1,0 @@
-{
-  "dependencies": {},
-  "theiaPlugins": {
-    "vscode-builtin-clojure": "https://open-vsx.org/api/vscode/clojure/1.55.2/file/vscode.clojure-1.55.2.vsix"
-  }
-}

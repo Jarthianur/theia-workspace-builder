@@ -1,6 +1,0 @@
-{
-  "dependencies": {},
-  "theiaPlugins": {
-    "vscode-builtin-groovy": "https://open-vsx.org/api/vscode/groovy/1.55.2/file/vscode.groovy-1.55.2.vsix"
-  }
-}

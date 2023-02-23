@@ -1,6 +1,0 @@
-{
-  "dependencies": {},
-  "theiaPlugins": {
-    "vscode-builtin-swift": "https://open-vsx.org/api/vscode/swift/1.55.2/file/vscode.swift-1.55.2.vsix"
-  }
-}
