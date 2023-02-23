@@ -2,26 +2,26 @@ RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
     echo "deb http://apt.llvm.org/{{ parameters.llvm_repo|default('bullseye') }}/ llvm-toolchain-{{ parameters.llvm_repo|default('bullseye') }} main" > /etc/apt/sources.list.d/llvm.list
 
 RUN apt update && apt install -y -qq \
-      clang clangd clang-format clang-tidy clazy
-      {%- if parameters.with_omp is sameas true %} \
-      libgomp1 libomp-dev libomp5
-      {%- endif %} \
-      gcc \
-      g++ \
-      cmake \
-      doxygen \
-      gdb \
-      valgrind \
-      cppcheck
-      {%- if parameters.with_boost is sameas true %} \
-      libboost-dev libboost-all-dev
-      {%- endif %}
-    {%- if parameters.with_omp is sameas true %} && \
-    apt install -y -qq libomp-16-dev
-    {%- endif %} && \
+    clang clangd clang-format clang-tidy clazy
+{%- if parameters.with_omp is sameas true %} \
+    libgomp1 libomp-dev libomp5
+{%- endif %} \
+    gcc \
+    g++ \
+    cmake \
+    doxygen \
+    gdb \
+    valgrind \
+    cppcheck
+{%- if parameters.with_boost is sameas true %} \
+    libboost-dev libboost-all-dev
+{%- endif %}
+{%- if parameters.with_omp is sameas true %} && \
+    apt install -y -qq libomp-17-dev
+{%- endif %} && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget -q https://github.com/linux-test-project/lcov/releases/download/v1.15/lcov-1.15.tar.gz && \
-    tar xf lcov-1.15.tar.gz && \
-    cp -n lcov-1.15/bin/* /usr/local/bin/ && \
-    rm -rf lcov-1.15*
+RUN wget -q https://github.com/linux-test-project/lcov/releases/download/v1.16/lcov-1.16.tar.gz && \
+    tar xf lcov-1.16.tar.gz && \
+    cp -n lcov-1.16/bin/* /usr/local/bin/ && \
+    rm -rf lcov-1.16*

@@ -1,7 +1,7 @@
 {
   "dependencies": {},
   "theiaPlugins": {
-    "vscode-python": "https://open-vsx.org/api/ms-python/python/2020.10.332292344/file/ms-python.python-2020.10.332292344.vsix",
-    "autodocstring": "https://open-vsx.org/api/njpwerner/autodocstring/0.5.4/file/njpwerner.autodocstring-0.5.4.vsix"
+    "ms-python.python": "https://open-vsx.org/api/ms-python/python/2022.12.1/file/ms-python.python-2022.12.1.vsix",
+    "njpwerner.autodocstring": "https://open-vsx.org/api/njpwerner/autodocstring/0.6.1/file/njpwerner.autodocstring-0.6.1.vsix"
   }
 }

@@ -1,7 +1,7 @@
 {
   "dependencies": {},
   "theiaPlugins": {
-    "cdt-gdb-vscode": "https://open-vsx.org/api/eclipse-cdt/cdt-gdb-vscode/0.0.92/file/eclipse-cdt.cdt-gdb-vscode-0.0.92.vsix",
-    "rust-lang": "https://open-vsx.org/api/rust-lang/rust/0.7.8/file/rust-lang.rust-0.7.8.vsix"
+    "eclipse-cdt.cdt-gdb-vscode": "https://open-vsx.org/api/eclipse-cdt/cdt-gdb-vscode/0.0.93/file/eclipse-cdt.cdt-gdb-vscode-0.0.93.vsix",
+    "rust-lang.rust-analyzer": "https://open-vsx.org/api/rust-lang/rust-analyzer/linux-x64/0.4.1412/file/rust-lang.rust-analyzer-0.4.1412@linux-x64.vsix"
   }
 }

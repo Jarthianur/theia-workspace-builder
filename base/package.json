@@ -27,6 +27,7 @@
     "@theia/git": "latest",
     "@theia/keymaps": "latest",
     "@theia/markers": "latest",
+    "@theia/memory-inspector": "latest",
     "@theia/messages": "latest",
     "@theia/metrics": "latest",
     "@theia/mini-browser": "latest",
@@ -46,9 +47,11 @@
     "@theia/scm": "latest",
     "@theia/scm-extra": "latest",
     "@theia/search-in-workspace": "latest",
+    "@theia/secondary-window": "latest",
     "@theia/task": "latest",
     "@theia/terminal": "latest",
     "@theia/timeline": "latest",
+    "@theia/toolbar": "latest",
     "@theia/typehierarchy": "latest",
     "@theia/userstorage": "latest",
     "@theia/variable-resolver": "latest",
@@ -62,22 +65,26 @@
   },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
-    "vscode-builtin-extensions-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.50.1/file/eclipse-theia.builtin-extension-pack-1.50.1.vsix",
-    "vscode-editorconfig": "https://open-vsx.org/api/EditorConfig/EditorConfig/0.16.6/file/EditorConfig.EditorConfig-0.16.6.vsix",
-    "vscode-references-view": "https://open-vsx.org/api/ms-vscode/references-view/0.0.89/file/ms-vscode.references-view-0.0.89.vsix",
-    "vscode-eslint": "https://open-vsx.org/api/dbaeumer/vscode-eslint/2.1.8/file/dbaeumer.vscode-eslint-2.1.8.vsix",
-    "marky-markdown": "https://open-vsx.org/api/robole/marky-markdown/2.9.0/file/robole.marky-markdown-2.9.0.vsix",
-    "prettier": "https://open-vsx.org/api/esbenp/prettier-vscode/6.4.0/file/esbenp.prettier-vscode-6.4.0.vsix"
+    "eclipse-theia.builtin-extensions-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.66.2/file/eclipse-theia.builtin-extension-pack-1.66.2.vsix",
+    "EditorConfig.EditorConfig": "https://open-vsx.org/api/EditorConfig/EditorConfig/0.16.6/file/EditorConfig.EditorConfig-0.16.6.vsix",
+    "ms-vscode.references-view": "https://open-vsx.org/api/ms-vscode/references-view/0.0.89/file/ms-vscode.references-view-0.0.89.vsix",
+    "dbaeumer.vscode-eslint": "https://open-vsx.org/api/dbaeumer/vscode-eslint/2.1.20/file/dbaeumer.vscode-eslint-2.1.20.vsix",
+    "robole.marky-markdown": "https://open-vsx.org/api/robole/marky-markdown/2.10.0/file/robole.marky-markdown-2.10.0.vsix",
+    "ms-vscode.js-debug": "https://open-vsx.org/api/ms-vscode/js-debug/1.66.1/file/ms-vscode.js-debug-1.66.1.vsix"
   },
   "theiaPluginsExcludeIds": [
     "vscode.extension-editing",
     "vscode.git",
     "vscode.git-ui",
+    "vscode.git-base",
     "vscode.github",
     "vscode.github-authentication",
     "vscode.microsoft-authentication",
+    "vscode.ipynb",
     "ms-vscode.js-debug-companion",
     "ms-python.vscode-pylance",
-    "ms-toolsai.jupyter"
+    "ms-toolsai.jupyter",
+    "ms-python.isort",
+    "vscode.markdown-language-features"
   ]
 }
