@@ -1,6 +1,0 @@
-{
-  "dependencies": {},
-  "theiaPlugins": {
-    "vscode-builtin-csharp": "https://open-vsx.org/api/vscode/csharp/1.49.3/file/vscode.csharp-1.49.3.vsix"
-  }
-}

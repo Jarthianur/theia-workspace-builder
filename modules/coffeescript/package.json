@@ -1,6 +1,0 @@
-{
-  "dependencies": {},
-  "theiaPlugins": {
-    "vscode-builtin-coffeescript": "https://open-vsx.org/api/vscode/coffeescript/1.49.3/file/vscode.coffeescript-1.49.3.vsix"
-  }
-}

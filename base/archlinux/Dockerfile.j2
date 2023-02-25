@@ -1,13 +1,11 @@
 FROM archlinux/archlinux:{{ base_tag|default('latest') }}
 
-ARG THEIA_UID=1337
+ARG THEIA_UID=1000
 
 RUN pacman -Syyuu --noconfirm && \
     pacman -S --needed --noconfirm \
-      yarn nodejs-lts-erbium npm tar grep awk wget git openssh make gcc python2 vim bash-completion binutils && \
-    pacman -Scc --noconfirm && \
-    npm config set python /usr/bin/python2 --global && \
-    npm config set python /usr/bin/python2
+      yarn nodejs-lts-fermium npm tar grep awk wget git openssh make gcc python vim bash-completion binutils && \
+    pacman -Scc --noconfirm
 
 RUN useradd -s /bin/bash -m -d /home/theia -U -u $THEIA_UID -c '' theia && \
     chmod g+rw /home && \

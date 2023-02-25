@@ -1,11 +1,11 @@
 FROM debian:{{ base_tag|default('latest') }}
 
-ARG THEIA_UID=1337
+ARG THEIA_UID=1000
 
 RUN apt update && \
     apt dist-upgrade -y -qq && \
     apt install -y -qq \
-      tar grep mawk wget git openssh-client make gcc python2 vim bash-completion binutils build-essential libssl-dev libsecret-1-0 && \
+    tar grep mawk wget git openssh-client make gcc python vim bash-completion binutils build-essential libssl-dev libsecret-1-0 && \
     apt autoremove -y -qq && \
     rm -rf /var/lib/apt/lists/*
 
@@ -25,18 +25,16 @@ USER theia
 WORKDIR /home/theia
 ADD package.json ./package.json
 
-RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh -O /tmp/nvm-install.sh && \
+RUN wget -q https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh -O /tmp/nvm-install.sh && \
     bash /tmp/nvm-install.sh && \
     rm -f /tmp/nvm-install.sh && \
     export NVM_DIR="/home/theia/.nvm" && \
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
-    nvm install 12 && \
-    nvm use 12 && \
+    nvm install 14 && \
+    nvm use 14 && \
     mkdir bin && \
     ln -s "$(echo -n $PATH | tr ':' '\n' | grep nvm)/node" /home/theia/bin/node && \
-    ln -s "$(echo -n $PATH | tr ':' '\n' | grep nvm)/npm" /home/theia/bin/npm && \
-    npm config set python /usr/bin/python2 --global && \
-    npm config set python /usr/bin/python2
+    ln -s "$(echo -n $PATH | tr ':' '\n' | grep nvm)/npm" /home/theia/bin/npm
 
 ENV PATH=/home/theia/bin:/home/theia/.local/bin:$PATH
 
